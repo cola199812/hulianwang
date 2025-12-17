@@ -7,6 +7,8 @@ import ActivityList from '../views/ActivityList.vue'
 import Routes from '../views/Routes.vue'
 import Activity from '../views/Activity.vue'
 import Creation from '../views/Creation.vue'
+import MyPosts from '../views/MyPosts.vue'
+import PostDetail from '../views/PostDetail.vue'
 import Gear from '../views/Gear.vue'
 import Tools from '../views/Tools.vue'
 import Notification from '../views/Notification.vue'
@@ -25,6 +27,8 @@ const routes = [
   { path: '/discover', component: Routes, meta: { requiresAuth: true } },
   { path: '/social', component: Activity, meta: { requiresAuth: true } },
   { path: '/creation', component: Creation, meta: { requiresAuth: true } },
+  { path: '/my-posts', component: MyPosts, meta: { requiresAuth: true } },
+  { path: '/post/:id', component: PostDetail, meta: { requiresAuth: true } },
   { path: '/gear', component: Gear, meta: { requiresAuth: true } },
   { path: '/tools', component: Tools, meta: { requiresAuth: true } },
   { path: '/notification', component: Notification, meta: { requiresAuth: true } },
@@ -50,4 +54,3 @@ router.beforeEach(async (to, from, next) => {
 })
 
 export default router
-
