@@ -2,7 +2,10 @@
   <div style="max-width: 900px; margin: 40px auto;">
     <el-card>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>活动列表</h2>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <el-button icon="el-icon-back" @click="$router.push('/social')">返回</el-button>
+          <h2>活动列表</h2>
+        </div>
         <div>
           <el-button @click="$router.push('/routes')">路线列表</el-button>
         </div>

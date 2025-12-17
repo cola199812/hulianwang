@@ -6,25 +6,57 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-      <div class="border rounded-lg p-4 hover:shadow cursor-pointer" @click="$router.push('/discover')">
-        <div class="text-green-600 text-2xl mb-2">🗺️</div>
-        <div class="font-semibold">附近路线</div>
-        <div class="text-sm text-gray-500">发现周边热门路线</div>
+      <div class="relative">
+        <el-button
+          type="default"
+          class="w-full h-full flex flex-col items-center justify-center p-6 rounded-lg border"
+          @click="$router.push('/discover')"
+        >
+          <div class="text-green-600 text-2xl mb-2">🗺️</div>
+          <div class="font-semibold">附近路线</div>
+        </el-button>
+        <div class="description-text absolute bottom-0 left-0 right-0 bg-white bg-opacity-95 text-xs p-2 rounded-b-lg shadow-sm transition-all duration-500 transform -translate-y-1 scale-95">
+          发现周边热门路线
+        </div>
       </div>
-      <div class="border rounded-lg p-4 hover:shadow cursor-pointer" @click="$router.push('/social')">
-        <div class="text-blue-600 text-2xl mb-2">🎉</div>
-        <div class="font-semibold">同城活动</div>
-        <div class="text-sm text-gray-500">加入附近精彩活动</div>
+      <div class="relative">
+        <el-button
+          type="default"
+          class="w-full h-full flex flex-col items-center justify-center p-6 rounded-lg border"
+          @click="$router.push('/social')"
+        >
+          <div class="text-blue-600 text-2xl mb-2">🎉</div>
+          <div class="font-semibold">同城活动</div>
+        </el-button>
+        <div class="description-text absolute bottom-0 left-0 right-0 bg-white bg-opacity-95 text-xs p-2 rounded-b-lg shadow-sm transition-all duration-500 transform -translate-y-1 scale-95">
+          加入附近精彩活动
+        </div>
       </div>
-      <div class="border rounded-lg p-4 hover:shadow cursor-pointer" @click="$router.push('/creation')">
-        <div class="text-purple-600 text-2xl mb-2">✍️</div>
-        <div class="font-semibold">写游记</div>
-        <div class="text-sm text-gray-500">记录你的探险故事</div>
+      <div class="relative">
+        <el-button
+          type="default"
+          class="w-full h-full flex flex-col items-center justify-center p-6 rounded-lg border"
+          @click="$router.push('/creation')"
+        >
+          <div class="text-purple-600 text-2xl mb-2">✍️</div>
+          <div class="font-semibold">写游记</div>
+        </el-button>
+        <div class="description-text absolute bottom-0 left-0 right-0 bg-white bg-opacity-95 text-xs p-2 rounded-b-lg shadow-sm transition-all duration-500 transform -translate-y-1 scale-95">
+          记录你的探险故事
+        </div>
       </div>
-      <div class="border rounded-lg p-4 hover:shadow cursor-pointer" @click="$router.push('/tools')">
-        <div class="text-orange-600 text-2xl mb-2">🧭</div>
-        <div class="font-semibold">工具箱</div>
-        <div class="text-sm text-gray-500">离线地图 & 轨迹 & 天气</div>
+      <div class="relative">
+        <el-button
+          type="default"
+          class="w-full h-full flex flex-col items-center justify-center p-6 rounded-lg border"
+          @click="$router.push('/tools')"
+        >
+          <div class="text-orange-600 text-2xl mb-2">🧭</div>
+          <div class="font-semibold">工具箱</div>
+        </el-button>
+        <div class="description-text absolute bottom-0 left-0 right-0 bg-white bg-opacity-95 text-xs p-2 rounded-b-lg shadow-sm transition-all duration-500 transform -translate-y-1 scale-95">
+          离线地图 & 轨迹 & 天气
+        </div>
       </div>
     </div>
 
@@ -107,6 +139,18 @@ onMounted(load)
 <style scoped>
 .masonry { column-count: 3; column-gap: 16px; }
 .brick { break-inside: avoid; margin-bottom: 16px; cursor: pointer; }
+
+/* 描述文字默认隐藏，悬停显示 */
+.description-text {
+  opacity: 0;
+  font-size: 12px;
+  color: #33373d;
+}
+.relative:hover .description-text {
+  opacity: 100;
+  transform: translateY(-0.25rem) scale(1);
+}
+
 @media (max-width: 768px) { .masonry { column-count: 2; } }
 @media (max-width: 480px) { .masonry { column-count: 1; } }
 </style>

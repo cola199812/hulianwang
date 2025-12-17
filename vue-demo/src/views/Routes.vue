@@ -2,7 +2,10 @@
   <div class="p-4" style="max-width: 1000px; margin: 0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h1 class="text-xl font-bold mb-4">路线发现</h1>
-      <el-button type="primary" @click="$router.push('/routes/create')">创建路线</el-button>
+      <div style="display:flex; gap:8px;">
+        <el-button type="primary" @click="$router.push('/routes/create')">创建路线</el-button>
+        <el-button @click="$router.push('/routes')">路线列表</el-button>
+      </div>
     </div>
 
     <el-form :model="filters" inline label-width="80px" class="mb-4">

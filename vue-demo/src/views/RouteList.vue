@@ -2,7 +2,10 @@
   <div style="max-width: 900px; margin: 40px auto;">
     <el-card>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>路线列表</h2>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <el-button icon="el-icon-back" @click="$router.push('/discover')">返回</el-button>
+          <h2>路线列表</h2>
+        </div>
         <div>
           <el-button type="primary" @click="$router.push('/routes/create')">创建路线</el-button>
           <el-button @click="$router.push('/activities')">活动列表</el-button>
@@ -49,7 +52,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { listRoutes, getRoute } from '../api/route'
 
 const routes = ref([])
