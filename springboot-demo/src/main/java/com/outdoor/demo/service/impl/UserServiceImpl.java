@@ -1,0 +1,72 @@
+package com.outdoor.demo.service.impl;
+
+import com.outdoor.demo.entity.User;
+import com.outdoor.demo.entity.UserRegisterRequest;
+import com.outdoor.demo.mapper.UserMapper;
+import com.outdoor.demo.service.UserService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.time.LocalDateTime;
+
+@Service
+public class UserServiceImpl implements UserService {
+    private final UserMapper userMapper;
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final com.outdoor.demo.service.VerificationCodeService verificationCodeService;
+
+    public UserServiceImpl(UserMapper userMapper, com.outdoor.demo.service.VerificationCodeService verificationCodeService) {
+        this.userMapper = userMapper;
+        this.verificationCodeService = verificationCodeService;
+    }
+
+    @Override
+    public User register(UserRegisterRequest req) {
+        if (!verificationCodeService.verifyCode(req.getEmail(), req.getVerificationCode())) {
+            throw new RuntimeException("验证码无效或已过期");
+        }
+        if (userMapper.findByUsername(req.getUsername()) != null) {
+            throw new RuntimeException("用户名已存在");
+        }
+        if (userMapper.findByUsernameOrPhoneOrEmail(req.getEmail()) != null) {
+            throw new RuntimeException("邮箱已被注册");
+        }
+
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(encoder.encode(req.getPassword()));
+        user.setEmail(req.getEmail());
+        user.setCreateTime(LocalDateTime.now());
+        userMapper.insert(user);
+        return user;
+    }
+
+    @Override
+    public User login(String username, String password) {
+        User user = userMapper.findByUsernameOrPhoneOrEmail(username);
+        if (user != null && encoder.matches(password, user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    public User getById(Long id) {
+        return userMapper.findById(id);
+    }
+
+    @Override
+    public void resetPassword(String email, String code, String newPassword) {
+        if (!verificationCodeService.verifyCode(email, code)) {
+            throw new RuntimeException("验证码无效或已过期");
+        }
+        User user = userMapper.findByUsernameOrPhoneOrEmail(email);
+        if (user == null) {
+            throw new RuntimeException("该邮箱未注册");
+        }
+        userMapper.updatePassword(email, encoder.encode(newPassword));
+    }
+}
+

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.outdoor.demo.mapper.ActivityMapper">
+    <resultMap id="ActivityMap" type="com.outdoor.demo.entity.Activity">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="routeId" column="route_id"/>
+        <result property="time" column="time"/>
+        <result property="maxPeople" column="max_people"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.outdoor.demo.entity.Activity" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO activity (name, route_id, time, max_people)
+        VALUES (#{name}, #{routeId}, #{time}, #{maxPeople})
+    </insert>
+
+    <select id="findById" parameterType="long" resultMap="ActivityMap">
+        SELECT id, name, route_id, time, max_people FROM activity WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="ActivityMap">
+        SELECT id, name, route_id, time, max_people FROM activity ORDER BY id DESC
+    </select>
+</mapper>
+
