@@ -2,11 +2,13 @@ C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\de
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\Post.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\RouteService.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\MediaMapper.java
+C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\CommentMapper.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\impl\UserServiceImpl.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\ContentService.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\PostMapper.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\ActivityService.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\controller\ActivityController.java
+C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\CommentLikeMapper.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\UserMapper.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\RouteCreateRequest.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\UserService.java
@@ -19,9 +21,12 @@ C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\de
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\Route.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\Media.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\ActivityMapper.java
+C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\PostLike.java
+C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\CommentLike.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\impl\ActivityServiceImpl.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\User.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\UserRegisterRequest.java
+C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\PostLikeMapper.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\Activity.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\controller\ContentController.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\ActivityCreateRequest.java
@@ -29,6 +34,7 @@ C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\de
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\mapper\RouteMapper.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\impl\VerificationCodeServiceImpl.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\config\CorsConfig.java
+C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\entity\Comment.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\controller\RouteController.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\VerificationCodeService.java
 C:\Users\20276\Desktop\互联网＋\springboot-demo\src\main\java\com\outdoor\demo\service\impl\ContentServiceImpl.java

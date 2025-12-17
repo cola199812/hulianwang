@@ -50,6 +50,18 @@
         <p><b>描述：</b>{{ detail.description }}</p>
       </div>
     </el-dialog>
+    
+    <div style="margin-top:16px;">
+      <h2 class="text-lg font-bold mb-3">精选路线</h2>
+      <div class="route-grid">
+        <div v-for="r in filtered.slice(0,6)" :key="r.id" class="route-card">
+          <div class="route-cover">{{ (r.name || '').slice(0,1) }}</div>
+          <div class="route-title">{{ r.name }}</div>
+          <div class="route-meta">{{ r.distance }} km · {{ r.level }}</div>
+          <el-button size="small" @click="viewDetail(r.id)">查看</el-button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -98,3 +110,13 @@ async function viewDetail(id) {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.route-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.route-card { border:1px solid #eee; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:6px; }
+.route-cover { width:100%; height:120px; border-radius:8px; background:linear-gradient(135deg,#8bd,#5ac); color:#fff; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:700; }
+.route-title { font-weight:600; }
+.route-meta { color:#666; font-size:12px; }
+@media (max-width: 768px) { .route-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width: 480px) { .route-grid { grid-template-columns:repeat(1,1fr); } }
+</style>

@@ -11,4 +11,5 @@ public interface MediaMapper {
     int insert(Media media);
     List<Media> findByUserId(@Param("userId") Long userId);
     List<Media> findByPostId(@Param("postId") Long postId);
+    int deleteByPostId(@Param("postId") Long postId);
 }

@@ -38,4 +38,8 @@
         FROM post
         WHERE id = #{id}
     </select>
+    
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM post WHERE id = #{id}
+    </delete>
 </mapper>

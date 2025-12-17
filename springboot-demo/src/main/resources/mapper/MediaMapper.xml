@@ -32,4 +32,8 @@
         WHERE post_id = #{postId}
         ORDER BY create_time DESC
     </select>
+    
+    <delete id="deleteByPostId" parameterType="long">
+        DELETE FROM media WHERE post_id = #{postId}
+    </delete>
 </mapper>

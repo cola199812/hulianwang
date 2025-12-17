@@ -12,4 +12,5 @@ public interface PostMapper {
     List<Post> findRecent();
     List<Post> findByUserId(@Param("userId") Long userId);
     Post findById(@Param("id") Long id);
+    int deleteById(@Param("id") Long id);
 }

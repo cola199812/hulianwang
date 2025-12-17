@@ -43,6 +43,18 @@
         </el-table-column>
       </el-table>
     </el-card>
+    <div style="margin-top:16px;">
+      <h3 style="font-weight:600; margin-bottom:8px;">精选活动</h3>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px;">
+        <el-card v-for="a in list.slice(0,3)" :key="a.id">
+          <div style="font-weight:600;">{{ a.name }}</div>
+          <div style="color:#666; font-size:12px; margin-top:4px;">{{ a.time }} · {{ a.currentPeople }}/{{ a.maxPeople }} 人</div>
+          <div style="margin-top:8px;">
+            <el-button size="small" type="success" @click="join(a.id)">报名</el-button>
+          </div>
+        </el-card>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -85,4 +97,3 @@ async function join(id) {
 
 onMounted(load)
 </script>
-

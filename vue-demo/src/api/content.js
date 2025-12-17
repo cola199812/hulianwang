@@ -29,3 +29,31 @@ export function listMyMedia() {
 export function listMediaByPost(postId) {
   return http.get(`/content/media/by-post/${postId}`)
 }
+
+export function postStats(postId) {
+  return http.get(`/content/post/${postId}/stats`)
+}
+
+export function likePost(postId) {
+  return http.post(`/content/post/${postId}/like`)
+}
+
+export function listComments(postId) {
+  return http.get(`/content/comment/list/${postId}`)
+}
+
+export function addComment(data) {
+  return http.post('/content/comment/add', data)
+}
+
+export function likeComment(commentId) {
+  return http.post(`/content/comment/${commentId}/like`)
+}
+
+export function commentStats(commentId) {
+  return http.get(`/content/comment/${commentId}/stats`)
+}
+
+export function deletePost(postId) {
+  return http.delete(`/content/post/${postId}`)
+}

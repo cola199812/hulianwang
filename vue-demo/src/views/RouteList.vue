@@ -8,7 +8,22 @@
           <el-button @click="$router.push('/activities')">活动列表</el-button>
         </div>
       </div>
-      <el-table :data="routes" style="width: 100%;">
+      <el-form :model="filters" inline label-width="80px" style="margin:12px 0;">
+        <el-form-item label="关键词">
+          <el-input v-model="filters.keyword" placeholder="按名称搜索" clearable />
+        </el-form-item>
+        <el-form-item label="难度">
+          <el-select v-model="filters.level" placeholder="全部" clearable style="width: 120px;">
+            <el-option label="简单" value="简单" />
+            <el-option label="中等" value="中等" />
+            <el-option label="困难" value="困难" />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="reset">重置</el-button>
+        </el-form-item>
+      </el-form>
+      <el-table :data="filtered" style="width: 100%;">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="路线名" />
         <el-table-column prop="distance" label="距离" />
@@ -40,6 +55,7 @@ import { listRoutes, getRoute } from '../api/route'
 const routes = ref([])
 const detailVisible = ref(false)
 const detail = ref(null)
+const filters = ref({ keyword:'', level:'' })
 
 async function load() {
   const { data } = await listRoutes()
@@ -53,5 +69,17 @@ async function viewDetail(id) {
 }
 
 onMounted(load)
-</script>
 
+const filtered = computed(() => {
+  return routes.value.filter(r => {
+    const byKeyword = !filters.value.keyword || (r.name || '').toLowerCase().includes(filters.value.keyword.toLowerCase())
+    const byLevel = !filters.value.level || r.level === filters.value.level
+    return byKeyword && byLevel
+  })
+})
+
+function reset() {
+  filters.value.keyword = ''
+  filters.value.level = ''
+}
+</script>

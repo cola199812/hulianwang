@@ -61,24 +61,52 @@
         </div>
       </div>
     </div>
+    
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-bold">📝 最新游记</h2>
+        <el-link type="primary" @click="$router.push('/creation')">更多</el-link>
+      </div>
+      <div class="masonry">
+        <div v-for="p in posts.slice(0,6)" :key="p.id" class="brick" @click="$router.push(`/post/${p.id}`)">
+          <PostCard :post="p" brief />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import PostCard from '../components/PostCard.vue'
 import { listRoutes } from '../api/route'
 import { listActivities } from '../api/activity'
+import { listPosts, listMediaByPost } from '../api/content'
 
 const routes = ref([])
 const activities = ref([])
+const posts = ref([])
 
 async function load() {
   try {
     const [r, a] = await Promise.all([listRoutes(), listActivities()])
     routes.value = r.data || []
     activities.value = a.data || []
+    const { data } = await listPosts()
+    posts.value = data || []
+    for (const p of posts.value) {
+      const res = await listMediaByPost(p.id).catch(()=>null)
+      p._media = res?.data || []
+    }
   } catch {}
 }
 
 onMounted(load)
 </script>
+
+<style scoped>
+.masonry { column-count: 3; column-gap: 16px; }
+.brick { break-inside: avoid; margin-bottom: 16px; cursor: pointer; }
+@media (max-width: 768px) { .masonry { column-count: 2; } }
+@media (max-width: 480px) { .masonry { column-count: 1; } }
+</style>

@@ -16,7 +16,14 @@ export function userInfo() {
   return http.get('/user/info')
 }
 
+export function userSimple(id) {
+  return http.get(`/user/simple/${id}`)
+}
+
+export function logout() {
+  return http.post('/user/logout')
+}
+
 export function resetPassword(email, verificationCode, newPassword) {
   return http.post('/user/reset-password', { email, verificationCode, newPassword })
 }
-

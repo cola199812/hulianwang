@@ -3,7 +3,7 @@
     <!-- 瀑布流 -->
     <div class="masonry">
       <div v-for="p in posts" :key="p.id" class="brick" @click="goDetail(p.id)">
-        <PostCard :post="p" />
+        <PostCard :post="p" brief />
       </div>
     </div>
 

@@ -2,6 +2,7 @@ package com.outdoor.demo.controller;
 
 import com.outdoor.demo.entity.Media;
 import com.outdoor.demo.entity.Post;
+import com.outdoor.demo.entity.Comment;
 import com.outdoor.demo.service.ContentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -72,6 +73,84 @@ public class ContentController {
             return ResponseEntity.status(404).body(body);
         }
         return ResponseEntity.ok(p);
+    }
+
+    @GetMapping("/post/{id}/stats")
+    public ResponseEntity<?> postStats(@PathVariable("id") Long id) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("likeCount", contentService.countPostLikes(id));
+        body.put("commentCount", contentService.countComments(id));
+        return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/post/{id}/like")
+    public ResponseEntity<?> likePost(@PathVariable("id") Long postId, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        boolean liked = contentService.togglePostLike(postId, userId);
+        Map<String, Object> body = new HashMap<>();
+        body.put("liked", liked);
+        body.put("likeCount", contentService.countPostLikes(postId));
+        return ResponseEntity.ok(body);
+    }
+
+    @GetMapping("/comment/list/{postId}")
+    public ResponseEntity<?> listComments(@PathVariable("postId") Long postId) {
+        List<Comment> list = contentService.listCommentsByPost(postId);
+        return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("/comment/add")
+    public ResponseEntity<?> addComment(@RequestBody Comment comment, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        comment.setUserId(userId);
+        if (comment.getContent() == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "内容不能为空");
+            return ResponseEntity.badRequest().body(body);
+        }
+        Long id = contentService.addComment(comment);
+        Map<String, Object> body = new HashMap<>();
+        body.put("id", id);
+        return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/comment/{id}/like")
+    public ResponseEntity<?> likeComment(@PathVariable("id") Long commentId, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        boolean liked = contentService.toggleCommentLike(commentId, userId);
+        Map<String, Object> body = new HashMap<>();
+        body.put("liked", liked);
+        body.put("likeCount", contentService.countCommentLikes(commentId));
+        return ResponseEntity.ok(body);
+    }
+
+    @GetMapping("/comment/{id}/stats")
+    public ResponseEntity<?> commentStats(@PathVariable("id") Long commentId) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("likeCount", contentService.countCommentLikes(commentId));
+        return ResponseEntity.ok(body);
+    }
+    
+    @DeleteMapping("/post/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable("id") Long postId, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+        boolean ok = contentService.deletePost(postId, (Long) uid);
+        Map<String, Object> body = new HashMap<>();
+        if (ok) {
+            body.put("message", "删除成功");
+            return ResponseEntity.ok(body);
+        } else {
+            body.put("message", "无权删除或帖子不存在");
+            return ResponseEntity.status(403).body(body);
+        }
     }
 
     @GetMapping("/media/list")

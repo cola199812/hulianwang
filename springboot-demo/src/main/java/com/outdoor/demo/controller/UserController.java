@@ -102,5 +102,27 @@ public class UserController {
         body.put("createTime", u.getCreateTime());
         return ResponseEntity.ok(body);
     }
-}
 
+    @GetMapping("/simple/{id}")
+    public ResponseEntity<?> simple(@PathVariable("id") Long id) {
+        User u = userService.getById(id);
+        if (u == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("id", 0L);
+            body.put("username", "匿名用户");
+            return ResponseEntity.ok(body);
+        }
+        Map<String, Object> body = new HashMap<>();
+        body.put("id", u.getId());
+        body.put("username", u.getUsername());
+        return ResponseEntity.ok(body);
+    }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.removeAttribute("userId");
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "已退出登录");
+        return ResponseEntity.ok(body);
+    }
+}

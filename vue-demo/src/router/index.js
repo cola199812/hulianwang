@@ -27,7 +27,7 @@ const routes = [
   { path: '/discover', component: Routes, meta: { requiresAuth: true } },
   { path: '/social', component: Activity, meta: { requiresAuth: true } },
   { path: '/creation', component: Creation, meta: { requiresAuth: true } },
-  { path: '/my-posts', component: MyPosts, meta: { requiresAuth: true } },
+  { path: '/my-posts', component: MyPosts, meta: { requiresAuth: false } },
   { path: '/post/:id', component: PostDetail, meta: { requiresAuth: true } },
   { path: '/gear', component: Gear, meta: { requiresAuth: true } },
   { path: '/tools', component: Tools, meta: { requiresAuth: true } },

@@ -13,6 +13,20 @@
         <el-descriptions-item label="注册时间">{{ info.createTime || '-' }}</el-descriptions-item>
       </el-descriptions>
     </el-card>
+    <div class="mt-4 grid grid-cols-3 gap-3">
+      <el-card class="nav-card" @click="$router.push('/my-posts')">
+        <div class="nav-title">我的发布</div>
+        <div class="nav-desc">查看与管理你的游记</div>
+      </el-card>
+      <el-card class="nav-card" @click="$router.push('/creation')">
+        <div class="nav-title">发布新内容</div>
+        <div class="nav-desc">记录最新行程与见闻</div>
+      </el-card>
+      <el-card class="nav-card" @click="$router.push('/notification')">
+        <div class="nav-title">通知中心</div>
+        <div class="nav-desc">查看系统与活动通知</div>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -31,3 +45,8 @@ async function load() {
 
 onMounted(load)
 </script>
+
+<style scoped>
+.nav-title { font-weight:600; }
+.nav-desc { color:#666; font-size:12px; margin-top:4px; }
+</style>
