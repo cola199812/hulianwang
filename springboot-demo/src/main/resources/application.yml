@@ -34,6 +34,6 @@ mybatis:
 
 minio:
   endpoint: http://localhost:9000
-  access-key: minioadmin
-  secret-key: minioadmin
+  access-key: root
+  secret-key: qq2027681066
   bucket-name: outdoor-media

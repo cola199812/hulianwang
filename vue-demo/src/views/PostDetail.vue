@@ -82,10 +82,46 @@ onMounted(async () => {
   const id = route.params.id
   const { data } = await getPost(id)
   post.value = data
-  const { data: list } = await listMediaByPost(id)
-  media.value = list || []
+  
+  // 组装媒体列表
+  const list = []
+  if (post.value.video) {
+    list.push({
+      id: post.value.video.id,
+      type: 'video',
+      url: post.value.video.videoUrl,
+      cover: post.value.video.coverUrl
+    })
+  }
+  if (post.value.images && post.value.images.length) {
+    post.value.images.forEach(img => {
+      list.push({
+        id: img.id,
+        type: 'image',
+        url: img.imageUrl,
+        desc: img.description
+      })
+    })
+  }
+  
+  // 兼容旧数据
+  if (list.length === 0) {
+    try {
+      const { data: oldMedia } = await listMediaByPost(id)
+      if (oldMedia) list.push(...oldMedia)
+    } catch {}
+  }
+  
+  media.value = list
+
   // 封面优先用 post.coverUrl，否则取第一张图
-  cover.value = post.value.coverUrl || (media.value.find(m => m.type === 'image')?.url || '')
+  if (post.value.coverUrl) {
+    cover.value = post.value.coverUrl
+  } else {
+    const firstImg = media.value.find(m => m.type === 'image')
+    cover.value = firstImg ? firstImg.url : ''
+  }
+
   try {
     const s = await postStats(id)
     like.value = s.data.likeCount || 0

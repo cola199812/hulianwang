@@ -74,12 +74,45 @@ const excerpt = computed(() => {
   return t.length > 100 ? t.slice(0, 100) + '...' : t
 })
 
-const mediaList = computed(() =>
-  (props.post._media || []).slice(0, 6)
-)
+const mediaList = computed(() => {
+  const list = []
+  
+  // 1. 优先使用新的数据结构 (post_video / post_image)
+  if (props.post.video) {
+    list.push({ 
+      id: props.post.video.id, 
+      type: 'video', 
+      url: props.post.video.videoUrl,
+      cover: props.post.video.coverUrl
+    })
+  }
+  
+  if (props.post.images && props.post.images.length) {
+    props.post.images.forEach(img => {
+      list.push({ 
+        id: img.id, 
+        type: 'image', 
+        url: img.imageUrl,
+        desc: img.description 
+      })
+    })
+  }
+  
+  // 2. 如果新数据为空，尝试兼容旧数据 (media 表)
+  if (list.length === 0 && props.post._media) {
+    return props.post._media.slice(0, 6)
+  }
+  
+  return list.slice(0, 6)
+})
 
 const heroUrl = computed(() => {
   if (props.post.coverUrl) return props.post.coverUrl
+  // 优先从新结构取第一张图
+  if (props.post.images && props.post.images.length > 0) {
+    return props.post.images[0].imageUrl
+  }
+  // 兼容旧结构
   const img = (props.post._media || []).find(m => m.type === 'image')
   return img ? img.url : ''
 })

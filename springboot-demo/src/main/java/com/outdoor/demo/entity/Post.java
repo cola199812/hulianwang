@@ -17,6 +17,10 @@ public class Post {
     
     // 非数据库字段，用于返回距离
     private Double distance;
+    
+    // 关联的图片和视频
+    private java.util.List<PostImage> images;
+    private PostVideo video;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -42,4 +46,10 @@ public class Post {
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public Double getDistance() { return distance; }
     public void setDistance(Double distance) { this.distance = distance; }
+    
+    public java.util.List<PostImage> getImages() { return images; }
+    public void setImages(java.util.List<PostImage> images) { this.images = images; }
+    
+    public PostVideo getVideo() { return video; }
+    public void setVideo(PostVideo video) { this.video = video; }
 }

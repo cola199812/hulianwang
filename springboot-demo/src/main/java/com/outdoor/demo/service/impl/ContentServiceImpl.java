@@ -52,10 +52,32 @@ public class ContentServiceImpl implements ContentService {
         }
     }
 
+    private void enrichPostWithMedia(Post post) {
+        if (post == null) return;
+        try {
+            post.setImages(postImageMapper.findByPostId(post.getId()));
+            List<PostVideo> videos = postVideoMapper.findByPostId(post.getId());
+            if (videos != null && !videos.isEmpty()) {
+                post.setVideo(videos.get(0));
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    private void enrichPosts(List<Post> posts) {
+        if (posts == null) return;
+        for (Post post : posts) {
+            enrichPostWithMedia(post);
+        }
+    }
+
     @Override
     public List<Post> listRecentPosts() {
         try {
-            return postMapper.findRecent();
+            List<Post> posts = postMapper.findRecent();
+            enrichPosts(posts);
+            return posts;
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -64,7 +86,9 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public List<Post> listUserPosts(Long userId) {
         try {
-            return postMapper.findByUserId(userId);
+            List<Post> posts = postMapper.findByUserId(userId);
+            enrichPosts(posts);
+            return posts;
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -73,7 +97,9 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public List<Post> listNearbyPosts(Double lat, Double lng, Double radius) {
         try {
-            return postMapper.findNearby(lat, lng, radius);
+            List<Post> posts = postMapper.findNearby(lat, lng, radius);
+            enrichPosts(posts);
+            return posts;
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
@@ -137,7 +163,8 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public PostVideo getPostVideo(Long postId) {
         try {
-            return postVideoMapper.findByPostId(postId);
+            List<PostVideo> list = postVideoMapper.findByPostId(postId);
+            return (list != null && !list.isEmpty()) ? list.get(0) : null;
         } catch (Exception e) {
             return null;
         }
@@ -146,7 +173,9 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public Post getPost(Long id) {
         try {
-            return postMapper.findById(id);
+            Post post = postMapper.findById(id);
+            enrichPostWithMedia(post);
+            return post;
         } catch (Exception e) {
             return null;
         }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
@@ -25,14 +26,38 @@ public class MinioServiceImpl implements MinioService {
         this.minioClient = minioClient;
     }
 
+    @PostConstruct
+    public void init() {
+        ensureBucket();
+        setBucketPolicy();
+    }
+
     private void ensureBucket() {
         try {
             boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!found) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-                // Set policy to public read (optional, for demo convenience)
-                // In production, better use presigned GET urls or Nginx proxy
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setBucketPolicy() {
+        try {
+            String policy = "{\n" +
+                    "  \"Version\": \"2012-10-17\",\n" +
+                    "  \"Statement\": [\n" +
+                    "    {\n" +
+                    "      \"Effect\": \"Allow\",\n" +
+                    "      \"Principal\": {\"AWS\": [\"*\"]},\n" +
+                    "      \"Action\": [\"s3:GetObject\"],\n" +
+                    "      \"Resource\": [\"arn:aws:s3:::" + bucketName + "/*\"]\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}";
+            minioClient.setBucketPolicy(
+                    SetBucketPolicyArgs.builder().bucket(bucketName).config(policy).build());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -14,10 +14,21 @@
 - 端口默认 `8080`
 
 ## 启动后端
+- 确保已启动 MinIO 服务（见下方“MinIO 配置”章节）
 - 进入 `springboot-demo` 目录
 - 安装 Maven 依赖并启动：
   - `mvn spring-boot:run`
 - 后端启动成功后监听 `http://localhost:8080/`
+
+## MinIO 配置（图片/视频存储）
+- 下载 MinIO Server: https://dl.min.io/server/minio/release/windows-amd64/minio.exe
+- 启动命令（PowerShell）:
+  ```powershell
+  # 默认账号密码均为 minioadmin
+  .\minio.exe server D:\minio_data --console-address ":9001"
+  ```
+- 访问控制台: `http://localhost:9001`
+- 确保 Bucket `outdoor-media` 存在（代码会自动创建，但需保证服务运行）
 
 ## 启动前端
 - 进入 `vue-demo` 目录
