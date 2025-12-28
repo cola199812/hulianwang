@@ -10,31 +10,34 @@
         <result property="locationName" column="location_name"/>
         <result property="lat" column="lat"/>
         <result property="lng" column="lng"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
         <result property="coverUrl" column="cover_url"/>
         <result property="createTime" column="create_time"/>
+        <result property="distance" column="distance"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.outdoor.demo.entity.Post" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO post (user_id, title, markdown, location_name, lat, lng, cover_url, create_time)
-        VALUES (#{userId}, #{title}, #{markdown}, #{locationName}, #{lat}, #{lng}, #{coverUrl}, NOW())
+        INSERT INTO post (user_id, title, markdown, location_name, lat, lng, like_count, comment_count, cover_url, create_time)
+        VALUES (#{userId}, #{title}, #{markdown}, #{locationName}, #{lat}, #{lng}, #{likeCount}, #{commentCount}, #{coverUrl}, NOW())
     </insert>
 
     <select id="findRecent" resultMap="PostMap">
-        SELECT id, user_id, title, markdown, location_name, lat, lng, cover_url, create_time
+        SELECT id, user_id, title, markdown, location_name, lat, lng, like_count, comment_count, cover_url, create_time, NULL as distance
         FROM post
         ORDER BY create_time DESC
         LIMIT 100
     </select>
 
     <select id="findByUserId" parameterType="long" resultMap="PostMap">
-        SELECT id, user_id, title, markdown, location_name, lat, lng, cover_url, create_time
+        SELECT id, user_id, title, markdown, location_name, lat, lng, like_count, comment_count, cover_url, create_time, NULL as distance
         FROM post
         WHERE user_id = #{userId}
         ORDER BY create_time DESC
     </select>
 
     <select id="findById" parameterType="long" resultMap="PostMap">
-        SELECT id, user_id, title, markdown, location_name, lat, lng, cover_url, create_time
+        SELECT id, user_id, title, markdown, location_name, lat, lng, like_count, comment_count, cover_url, create_time, NULL as distance
         FROM post
         WHERE id = #{id}
     </select>

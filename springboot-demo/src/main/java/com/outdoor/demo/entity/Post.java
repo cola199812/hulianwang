@@ -10,8 +10,13 @@ public class Post {
     private String locationName;
     private Double lat;
     private Double lng;
+    private Integer likeCount;
+    private Integer commentCount;
     private String coverUrl;
     private LocalDateTime createTime;
+    
+    // 非数据库字段，用于返回距离
+    private Double distance;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -27,8 +32,14 @@ public class Post {
     public void setLat(Double lat) { this.lat = lat; }
     public Double getLng() { return lng; }
     public void setLng(Double lng) { this.lng = lng; }
+    public Integer getLikeCount() { return likeCount; }
+    public void setLikeCount(Integer likeCount) { this.likeCount = likeCount; }
+    public Integer getCommentCount() { return commentCount; }
+    public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
     public String getCoverUrl() { return coverUrl; }
     public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public Double getDistance() { return distance; }
+    public void setDistance(Double distance) { this.distance = distance; }
 }

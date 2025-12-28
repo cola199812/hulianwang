@@ -57,3 +57,21 @@ export function commentStats(commentId) {
 export function deletePost(postId) {
   return http.delete(`/content/post/${postId}`)
 }
+
+export function listNearbyPosts(lat, lng, radius = 5000) {
+  return http.get('/content/post/nearby', {
+    params: { lat, lng, radius }
+  })
+}
+
+export function getPresignedUrl(objectName) {
+  return http.get('/content/upload/presigned-url', { params: { objectName } })
+}
+
+export function savePostImages(postId, images) {
+  return http.post(`/content/post/${postId}/images`, images)
+}
+
+export function savePostVideo(postId, video) {
+  return http.post(`/content/post/${postId}/video`, video)
+}

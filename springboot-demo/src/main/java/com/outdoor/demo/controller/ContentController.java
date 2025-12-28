@@ -2,8 +2,12 @@ package com.outdoor.demo.controller;
 
 import com.outdoor.demo.entity.Media;
 import com.outdoor.demo.entity.Post;
+import com.outdoor.demo.entity.PostImage;
+import com.outdoor.demo.entity.PostVideo;
 import com.outdoor.demo.entity.Comment;
 import com.outdoor.demo.service.ContentService;
+import com.outdoor.demo.service.MinioService;
+import com.outdoor.demo.utils.VideoUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +26,11 @@ import java.util.UUID;
 @Validated
 public class ContentController {
     private final ContentService contentService;
+    private final MinioService minioService;
 
-    public ContentController(ContentService contentService) {
+    public ContentController(ContentService contentService, MinioService minioService) {
         this.contentService = contentService;
+        this.minioService = minioService;
     }
 
     @PostMapping("/post/create")
@@ -61,6 +67,14 @@ public class ContentController {
         Object uid = session.getAttribute("userId");
         Long userId = uid instanceof Long ? (Long) uid : 0L;
         List<Post> list = contentService.listUserPosts(userId);
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/post/nearby")
+    public ResponseEntity<?> listNearbyPosts(@RequestParam("lat") Double lat,
+                                             @RequestParam("lng") Double lng,
+                                             @RequestParam(value = "radius", defaultValue = "5000") Double radius) {
+        List<Post> list = contentService.listNearbyPosts(lat, lng, radius);
         return ResponseEntity.ok(list);
     }
 
@@ -169,6 +183,64 @@ public class ContentController {
     public ResponseEntity<?> listMediaByPost(@PathVariable("postId") Long postId) {
         List<com.outdoor.demo.entity.Media> list = contentService.listMediaByPost(postId);
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/upload/presigned-url")
+    public ResponseEntity<?> getPresignedUrl(@RequestParam("objectName") String objectName) {
+        try {
+            String presignedUrl = minioService.getPresignedUrl(objectName);
+            return ResponseEntity.ok(Map.of("presignedUrl", presignedUrl));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "获取上传凭证失败: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/post/{id}/images")
+    public ResponseEntity<?> saveImages(@PathVariable("id") Long postId, @RequestBody List<PostImage> images) {
+        if (images == null || images.isEmpty()) {
+             return ResponseEntity.badRequest().body(Map.of("message", "图片列表为空"));
+        }
+        for (PostImage img : images) {
+            img.setPostId(postId);
+        }
+        contentService.savePostImages(images);
+        return ResponseEntity.ok(Map.of("message", "图片保存成功"));
+    }
+
+    @PostMapping("/post/{id}/video")
+    public ResponseEntity<?> saveVideo(@PathVariable("id") Long postId, @RequestBody PostVideo video) {
+        video.setPostId(postId);
+        
+        // Auto generate cover if missing
+        if (video.getCoverUrl() == null || video.getCoverUrl().isEmpty()) {
+             try {
+                 String tempCoverName = UUID.randomUUID().toString() + ".jpg";
+                 File tempFile = File.createTempFile("cover", ".jpg");
+                 String tempPath = tempFile.getAbsolutePath();
+                 
+                 String videoUrl = video.getVideoUrl();
+                 // If not http, assume object name and construct url (or get presigned GET if needed)
+                 // For now assume public or handled by MinioService
+                 if (!videoUrl.startsWith("http")) {
+                     videoUrl = minioService.getObjectUrl(videoUrl); 
+                 }
+                 
+                 boolean success = VideoUtils.generateCover(videoUrl, tempPath);
+                 if (success) {
+                     String objectName = "covers/" + tempCoverName;
+                     try (java.io.FileInputStream fis = new java.io.FileInputStream(tempFile)) {
+                         String coverUrl = minioService.uploadFile(fis, objectName, "image/jpeg");
+                         video.setCoverUrl(coverUrl);
+                     }
+                 }
+                 tempFile.delete();
+             } catch (Exception e) {
+                 e.printStackTrace();
+             }
+        }
+        
+        contentService.savePostVideo(video);
+        return ResponseEntity.ok(Map.of("message", "视频保存成功"));
     }
 
     @PostMapping("/upload")

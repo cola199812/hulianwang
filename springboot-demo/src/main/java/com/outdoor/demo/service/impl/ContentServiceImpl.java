@@ -2,9 +2,13 @@ package com.outdoor.demo.service.impl;
 
 import com.outdoor.demo.entity.Post;
 import com.outdoor.demo.entity.Media;
+import com.outdoor.demo.entity.PostImage;
+import com.outdoor.demo.entity.PostVideo;
 import com.outdoor.demo.entity.Comment;
 import com.outdoor.demo.mapper.PostMapper;
 import com.outdoor.demo.mapper.MediaMapper;
+import com.outdoor.demo.mapper.PostImageMapper;
+import com.outdoor.demo.mapper.PostVideoMapper;
 import com.outdoor.demo.mapper.PostLikeMapper;
 import com.outdoor.demo.mapper.CommentMapper;
 import com.outdoor.demo.mapper.CommentLikeMapper;
@@ -22,14 +26,19 @@ public class ContentServiceImpl implements ContentService {
     private final PostLikeMapper postLikeMapper;
     private final CommentMapper commentMapper;
     private final CommentLikeMapper commentLikeMapper;
+    private final PostImageMapper postImageMapper;
+    private final PostVideoMapper postVideoMapper;
 
     public ContentServiceImpl(PostMapper postMapper, MediaMapper mediaMapper,
-                              PostLikeMapper postLikeMapper, CommentMapper commentMapper, CommentLikeMapper commentLikeMapper) {
+                              PostLikeMapper postLikeMapper, CommentMapper commentMapper, CommentLikeMapper commentLikeMapper,
+                              PostImageMapper postImageMapper, PostVideoMapper postVideoMapper) {
         this.postMapper = postMapper;
         this.mediaMapper = mediaMapper;
         this.postLikeMapper = postLikeMapper;
         this.commentMapper = commentMapper;
         this.commentLikeMapper = commentLikeMapper;
+        this.postImageMapper = postImageMapper;
+        this.postVideoMapper = postVideoMapper;
     }
 
     @Override
@@ -62,6 +71,16 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    public List<Post> listNearbyPosts(Double lat, Double lng, Double radius) {
+        try {
+            return postMapper.findNearby(lat, lng, radius);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public List<Media> listUserMedia(Long userId) {
         try {
             return mediaMapper.findByUserId(userId);
@@ -87,6 +106,40 @@ public class ContentServiceImpl implements ContentService {
             return mediaMapper.findByPostId(postId);
         } catch (Exception e) {
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    @Transactional
+    public void savePostImages(List<PostImage> images) {
+        if (images == null || images.isEmpty()) return;
+        for (PostImage img : images) {
+            postImageMapper.insert(img);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void savePostVideo(PostVideo video) {
+        if (video == null) return;
+        postVideoMapper.insert(video);
+    }
+
+    @Override
+    public List<PostImage> listPostImages(Long postId) {
+        try {
+            return postImageMapper.findByPostId(postId);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public PostVideo getPostVideo(Long postId) {
+        try {
+            return postVideoMapper.findByPostId(postId);
+        } catch (Exception e) {
+            return null;
         }
     }
 

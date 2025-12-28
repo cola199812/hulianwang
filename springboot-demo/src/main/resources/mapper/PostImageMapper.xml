@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.outdoor.demo.mapper.PostImageMapper">
+    <resultMap id="PostImageMap" type="com.outdoor.demo.entity.PostImage">
+        <id property="id" column="id"/>
+        <result property="postId" column="post_id"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="description" column="description"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="tag" column="tag"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.outdoor.demo.entity.PostImage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post_image (post_id, image_url, description, sort_order, tag)
+        VALUES (#{postId}, #{imageUrl}, #{description}, #{sortOrder}, #{tag})
+    </insert>
+
+    <select id="findByPostId" parameterType="long" resultMap="PostImageMap">
+        SELECT id, post_id, image_url, description, sort_order, tag
+        FROM post_image
+        WHERE post_id = #{postId}
+        ORDER BY sort_order ASC
+    </select>
+</mapper>

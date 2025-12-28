@@ -1,11 +1,13 @@
 CREATE TABLE IF NOT EXISTS `post` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
-  `title` VARCHAR(255) NULL,
+  `title` VARCHAR(100) NULL,
   `markdown` TEXT NULL,
-  `location_name` VARCHAR(255) NULL,
-  `lat` DOUBLE NULL,
-  `lng` DOUBLE NULL,
+  `location_name` VARCHAR(100) NULL,
+  `lat` DECIMAL(10,6) NULL,
+  `lng` DECIMAL(10,6) NULL,
+  `like_count` INT DEFAULT 0,
+  `comment_count` INT DEFAULT 0,
   `cover_url` VARCHAR(255) NULL,
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -20,6 +22,23 @@ CREATE TABLE IF NOT EXISTS `media` (
   `album` VARCHAR(128) NULL,
   `tags` VARCHAR(255) NULL,
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `post_image` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `post_id` BIGINT,
+  `image_url` VARCHAR(255),
+  `description` VARCHAR(100),
+  `sort_order` INT,
+  `tag` VARCHAR(50)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `post_video` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `post_id` BIGINT,
+  `video_url` VARCHAR(255),
+  `cover_url` VARCHAR(255),
+  `duration` INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `post_like` (
