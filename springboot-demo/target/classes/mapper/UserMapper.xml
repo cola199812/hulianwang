@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.outdoor.demo.mapper.UserMapper">
-    <!-- 注解已覆盖所有方法，XML留空即可，或删除此文件 -->
-</mapper>
-
