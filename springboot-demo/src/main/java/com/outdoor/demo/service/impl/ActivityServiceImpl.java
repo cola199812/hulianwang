@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+/**
+ * 活动服务实现类
+ * 实现活动相关的业务逻辑。
+ */
 public class ActivityServiceImpl implements ActivityService {
     private final ActivityMapper activityMapper;
     private final ActivityUserMapper activityUserMapper;
@@ -25,12 +29,20 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Transactional
+    /**
+     * 创建活动
+     * 将活动信息插入数据库。
+     */
     public Long create(Activity activity) {
         activityMapper.insert(activity);
         return activity.getId();
     }
 
     @Override
+    /**
+     * 获取活动列表
+     * 查询所有活动，并统计每个活动的当前报名人数。
+     */
     public List<Map<String, Object>> listWithCurrentPeople() {
         List<Activity> list = activityMapper.findAll();
         List<Map<String, Object>> result = new ArrayList<>();
@@ -50,6 +62,10 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Transactional
+    /**
+     * 报名活动
+     * 检查活动是否存在、人数是否已满、用户是否已报名，然后插入报名记录。
+     */
     public boolean join(Long activityId, Long userId) {
         Activity a = activityMapper.findById(activityId);
         if (a == null) {

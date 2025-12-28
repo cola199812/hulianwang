@@ -25,11 +25,7 @@
         <div class="tool-title">紧急求助</div>
         <div class="tool-desc">一键分享坐标与状态</div>
       </el-card>
-      <el-card class="tool-card">
-        <div class="tool-icon">❤️</div>
-        <div class="tool-title">健康监测</div>
-        <div class="tool-desc">心率/血氧/步频监测</div>
-      </el-card>
+      
     </div>
   </div>
 </template>

@@ -20,6 +20,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/content")
 @Validated
+/**
+ * 内容控制器
+ * 处理帖子、评论、点赞和媒体上传等相关功能的HTTP请求。
+ */
 public class ContentController {
     private final ContentService contentService;
 
@@ -27,6 +31,14 @@ public class ContentController {
         this.contentService = contentService;
     }
 
+    /**
+     * 发布帖子
+     * 用户发布新的帖子，支持设置标题、内容、位置等信息。
+     *
+     * @param post 帖子对象
+     * @param session HTTP会话
+     * @return 发布结果
+     */
     @PostMapping("/post/create")
     public ResponseEntity<?> createPost(@RequestBody Post post, HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -50,12 +62,24 @@ public class ContentController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 获取最新帖子列表
+     *
+     * @return 帖子列表
+     */
     @GetMapping("/post/list")
     public ResponseEntity<?> listPosts() {
         List<Post> list = contentService.listRecentPosts();
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * 获取我的帖子列表
+     * 获取当前登录用户发布的帖子。
+     *
+     * @param session HTTP会话
+     * @return 用户帖子列表
+     */
     @GetMapping("/post/my")
     public ResponseEntity<?> listMyPosts(HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -64,6 +88,13 @@ public class ContentController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * 获取帖子详情
+     * 根据ID获取单个帖子的详细信息。
+     *
+     * @param id 帖子ID
+     * @return 帖子详情
+     */
     @GetMapping("/post/{id}")
     public ResponseEntity<?> getPost(@PathVariable("id") Long id) {
         Post p = contentService.getPost(id);
@@ -75,6 +106,13 @@ public class ContentController {
         return ResponseEntity.ok(p);
     }
 
+    /**
+     * 获取帖子统计信息
+     * 获取帖子的点赞数和评论数。
+     *
+     * @param id 帖子ID
+     * @return 统计信息
+     */
     @GetMapping("/post/{id}/stats")
     public ResponseEntity<?> postStats(@PathVariable("id") Long id) {
         Map<String, Object> body = new HashMap<>();
@@ -83,6 +121,13 @@ public class ContentController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 点赞/取消点赞帖子
+     *
+     * @param postId 帖子ID
+     * @param session HTTP会话
+     * @return 点赞状态和最新点赞数
+     */
     @PostMapping("/post/{id}/like")
     public ResponseEntity<?> likePost(@PathVariable("id") Long postId, HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -94,12 +139,26 @@ public class ContentController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 获取评论列表
+     * 获取指定帖子的所有评论。
+     *
+     * @param postId 帖子ID
+     * @return 评论列表
+     */
     @GetMapping("/comment/list/{postId}")
     public ResponseEntity<?> listComments(@PathVariable("postId") Long postId) {
         List<Comment> list = contentService.listCommentsByPost(postId);
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * 添加评论
+     *
+     * @param comment 评论对象
+     * @param session HTTP会话
+     * @return 新评论ID
+     */
     @PostMapping("/comment/add")
     public ResponseEntity<?> addComment(@RequestBody Comment comment, HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -116,6 +175,13 @@ public class ContentController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 点赞/取消点赞评论
+     *
+     * @param commentId 评论ID
+     * @param session HTTP会话
+     * @return 点赞状态和最新点赞数
+     */
     @PostMapping("/comment/{id}/like")
     public ResponseEntity<?> likeComment(@PathVariable("id") Long commentId, HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -127,6 +193,12 @@ public class ContentController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 获取评论统计信息
+     *
+     * @param commentId 评论ID
+     * @return 点赞数
+     */
     @GetMapping("/comment/{id}/stats")
     public ResponseEntity<?> commentStats(@PathVariable("id") Long commentId) {
         Map<String, Object> body = new HashMap<>();
@@ -134,6 +206,13 @@ public class ContentController {
         return ResponseEntity.ok(body);
     }
     
+    /**
+     * 删除帖子
+     *
+     * @param postId 帖子ID
+     * @param session HTTP会话
+     * @return 删除结果
+     */
     @DeleteMapping("/post/{id}")
     public ResponseEntity<?> deletePost(@PathVariable("id") Long postId, HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -153,6 +232,12 @@ public class ContentController {
         }
     }
 
+    /**
+     * 获取用户媒体列表
+     *
+     * @param session HTTP会话
+     * @return 媒体文件列表
+     */
     @GetMapping("/media/list")
     public ResponseEntity<?> listMedia(HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -165,12 +250,31 @@ public class ContentController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * 获取帖子媒体列表
+     *
+     * @param postId 帖子ID
+     * @return 媒体文件列表
+     */
     @GetMapping("/media/by-post/{postId}")
     public ResponseEntity<?> listMediaByPost(@PathVariable("postId") Long postId) {
         List<com.outdoor.demo.entity.Media> list = contentService.listMediaByPost(postId);
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * 上传文件
+     * 上传图片或视频文件，并保存到服务器。
+     *
+     * @param file 上传的文件
+     * @param type 文件类型
+     * @param postId 关联帖子ID
+     * @param album 相册名称
+     * @param tags 标签
+     * @param session HTTP会话
+     * @return 文件访问URL
+     * @throws IOException IO异常
+     */
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file,
                                     @RequestParam(value = "type", required = false) String type,

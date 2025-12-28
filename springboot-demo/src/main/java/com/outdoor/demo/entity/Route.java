@@ -1,11 +1,21 @@
 package com.outdoor.demo.entity;
 
+/**
+ * 路线实体类
+ * 对应数据库中的route表，存储户外路线信息。
+ */
 public class Route {
+    /** 路线ID */
     private Long id;
+    /** 路线名称 */
     private String name;
+    /** 路线距离（公里） */
     private Double distance;
+    /** 难度等级（如：简单、中等、困难） */
     private String level;
+    /** 路线描述 */
     private String description;
+    /** 创建者ID */
     private Long creatorId;
 
     public Long getId() {

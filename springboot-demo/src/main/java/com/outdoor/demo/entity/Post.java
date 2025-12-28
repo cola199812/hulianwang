@@ -2,15 +2,28 @@ package com.outdoor.demo.entity;
 
 import java.time.LocalDateTime;
 
+/**
+ * 帖子实体类
+ * 对应数据库中的post表，存储用户发布的帖子内容。
+ */
 public class Post {
+    /** 帖子ID */
     private Long id;
+    /** 发帖人用户ID */
     private Long userId;
+    /** 标题 */
     private String title;
+    /** Markdown内容 */
     private String markdown;
+    /** 地点名称 */
     private String locationName;
+    /** 纬度 */
     private Double lat;
+    /** 经度 */
     private Double lng;
+    /** 封面图片URL */
     private String coverUrl;
+    /** 发布时间 */
     private LocalDateTime createTime;
 
     public Long getId() { return id; }

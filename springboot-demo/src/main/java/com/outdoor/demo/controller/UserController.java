@@ -17,6 +17,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/user")
 @Validated
+/**
+ * 用户控制器
+ * 处理用户注册、登录、信息查询、密码重置等相关功能的HTTP请求。
+ */
 public class UserController {
     private final UserService userService;
     private final com.outdoor.demo.service.VerificationCodeService verificationCodeService;
@@ -26,14 +30,27 @@ public class UserController {
         this.verificationCodeService = verificationCodeService;
     }
 
+    /**
+     * 发送验证码
+     * 向指定邮箱发送验证码，用于注册或重置密码。
+     *
+     * @param email 邮箱地址
+     * @return 发送结果
+     */
     @PostMapping("/send-code")
     public ResponseEntity<?> sendCode(@RequestParam String email) {
         verificationCodeService.sendCode(email);
         Map<String, Object> body = new HashMap<>();
-        body.put("message", "验证码已发送（请查看控制台）");
+        body.put("message", "验证码已发送");
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 用户注册
+     *
+     * @param req 注册请求对象
+     * @return 注册结果
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequest req) {
         try {
@@ -48,6 +65,12 @@ public class UserController {
         }
     }
 
+    /**
+     * 重置密码
+     *
+     * @param req 重置密码请求对象
+     * @return 重置结果
+     */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody UserResetPasswordRequest req) {
         try {
@@ -62,7 +85,13 @@ public class UserController {
         }
     }
 
-    // 处理参数校验异常（如邮箱格式错误、为空等）
+    /**
+     * 处理参数校验异常
+     * 当请求参数不符合验证规则时，捕获异常并返回友好的错误信息。
+     *
+     * @param ex 异常对象
+     * @return 错误响应
+     */
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(org.springframework.web.bind.MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -72,6 +101,13 @@ public class UserController {
         return ResponseEntity.badRequest().body(body);
     }
 
+    /**
+     * 用户登录
+     *
+     * @param req 登录请求对象
+     * @param session HTTP会话
+     * @return 登录结果
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginRequest req, HttpSession session) {
         User user = userService.login(req.getUsername(), req.getPassword());
@@ -87,6 +123,12 @@ public class UserController {
         }
     }
 
+    /**
+     * 获取当前用户信息
+     *
+     * @param session HTTP会话
+     * @return 用户信息
+     */
     @GetMapping("/info")
     public ResponseEntity<?> info(HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -103,6 +145,13 @@ public class UserController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 获取简略用户信息
+     * 根据用户ID获取公开的简单信息。
+     *
+     * @param id 用户ID
+     * @return 简略用户信息
+     */
     @GetMapping("/simple/{id}")
     public ResponseEntity<?> simple(@PathVariable("id") Long id) {
         User u = userService.getById(id);
@@ -118,6 +167,12 @@ public class UserController {
         return ResponseEntity.ok(body);
     }
     
+    /**
+     * 退出登录
+     *
+     * @param session HTTP会话
+     * @return 退出结果
+     */
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
         session.removeAttribute("userId");

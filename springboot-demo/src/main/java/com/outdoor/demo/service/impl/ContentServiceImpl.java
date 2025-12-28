@@ -16,6 +16,10 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+/**
+ * 内容服务实现类
+ * 实现帖子、评论、点赞等内容的业务逻辑。
+ */
 public class ContentServiceImpl implements ContentService {
     private final PostMapper postMapper;
     private final MediaMapper mediaMapper;
@@ -34,6 +38,9 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional
+    /**
+     * 创建帖子
+     */
     public Long createPost(Post post) {
         try {
             postMapper.insert(post);
@@ -44,6 +51,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 获取最新帖子列表
+     */
     public List<Post> listRecentPosts() {
         try {
             return postMapper.findRecent();
@@ -53,6 +63,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 获取指定用户的帖子列表
+     */
     public List<Post> listUserPosts(Long userId) {
         try {
             return postMapper.findByUserId(userId);
@@ -62,6 +75,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 获取指定用户的媒体列表
+     */
     public List<Media> listUserMedia(Long userId) {
         try {
             return mediaMapper.findByUserId(userId);
@@ -72,6 +88,9 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional
+    /**
+     * 保存媒体信息
+     */
     public Long saveMedia(Media media) {
         try {
             mediaMapper.insert(media);
@@ -82,6 +101,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 获取指定帖子的媒体列表
+     */
     public List<Media> listMediaByPost(Long postId) {
         try {
             return mediaMapper.findByPostId(postId);
@@ -91,6 +113,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 获取帖子详情
+     */
     public Post getPost(Long id) {
         try {
             return postMapper.findById(id);
@@ -100,12 +125,19 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 统计帖子点赞数
+     */
     public int countPostLikes(Long postId) {
         return postLikeMapper.countByPostId(postId);
     }
 
     @Override
     @Transactional
+    /**
+     * 切换帖子点赞状态
+     * 如果已点赞则取消，否则添加点赞。
+     */
     public boolean togglePostLike(Long postId, Long userId) {
         Integer exists = postLikeMapper.exists(postId, userId);
         if (exists != null && exists > 0) {
@@ -119,6 +151,9 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional
+    /**
+     * 添加评论
+     */
     public Long addComment(Comment comment) {
         try {
             commentMapper.insert(comment);
@@ -129,6 +164,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 获取帖子的评论列表
+     */
     public List<Comment> listCommentsByPost(Long postId) {
         try {
             return commentMapper.findByPostId(postId);
@@ -138,17 +176,26 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    /**
+     * 统计帖子评论数
+     */
     public int countComments(Long postId) {
         return commentMapper.countByPostId(postId);
     }
 
     @Override
+    /**
+     * 统计评论点赞数
+     */
     public int countCommentLikes(Long commentId) {
         return commentLikeMapper.countByCommentId(commentId);
     }
 
     @Override
     @Transactional
+    /**
+     * 切换评论点赞状态
+     */
     public boolean toggleCommentLike(Long commentId, Long userId) {
         Integer exists = commentLikeMapper.exists(commentId, userId);
         if (exists != null && exists > 0) {
@@ -162,6 +209,10 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional
+    /**
+     * 删除帖子
+     * 同时删除帖子相关的点赞、评论、媒体等数据。
+     */
     public boolean deletePost(Long postId, Long userId) {
         Post p = postMapper.findById(postId);
         if (p == null || p.getUserId() == null || !p.getUserId().equals(userId)) {

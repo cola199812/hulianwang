@@ -12,6 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.time.LocalDateTime;
 
 @Service
+/**
+ * 用户服务实现类
+ * 实现用户注册、登录、信息管理等业务逻辑。
+ */
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -23,6 +27,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    /**
+     * 用户注册
+     * 校验验证码、用户名/邮箱唯一性，加密密码后保存用户。
+     */
     public User register(UserRegisterRequest req) {
         if (!verificationCodeService.verifyCode(req.getEmail(), req.getVerificationCode())) {
             throw new RuntimeException("验证码无效或已过期");
@@ -44,6 +52,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    /**
+     * 用户登录
+     * 验证用户名和密码。
+     */
     public User login(String username, String password) {
         User user = userMapper.findByUsernameOrPhoneOrEmail(username);
         if (user != null && encoder.matches(password, user.getPassword())) {
@@ -53,11 +65,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    /**
+     * 根据ID获取用户
+     */
     public User getById(Long id) {
         return userMapper.findById(id);
     }
 
     @Override
+    /**
+     * 重置密码
+     * 校验验证码，更新用户密码。
+     */
     public void resetPassword(String email, String code, String newPassword) {
         if (!verificationCodeService.verifyCode(email, code)) {
             throw new RuntimeException("验证码无效或已过期");

@@ -16,6 +16,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/route")
 @Validated
+/**
+ * 路线控制器
+ * 处理路线相关的HTTP请求，包括路线的创建、列表查询和详情查看。
+ */
 public class RouteController {
     private final RouteService routeService;
 
@@ -23,12 +27,25 @@ public class RouteController {
         this.routeService = routeService;
     }
 
+    /**
+     * 获取所有路线
+     *
+     * @return 路线列表
+     */
     @GetMapping("/list")
     public ResponseEntity<?> list() {
         List<Route> routes = routeService.listAll();
         return ResponseEntity.ok(routes);
     }
 
+    /**
+     * 创建路线
+     * 只有登录用户才能创建路线。
+     *
+     * @param req 路线创建请求对象
+     * @param session HTTP会话
+     * @return 创建结果
+     */
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody RouteCreateRequest req, HttpSession session) {
         Object uid = session.getAttribute("userId");
@@ -50,6 +67,12 @@ public class RouteController {
         return ResponseEntity.ok(body);
     }
 
+    /**
+     * 获取路线详情
+     *
+     * @param id 路线ID
+     * @return 路线详情
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> detail(@PathVariable("id") Long id) {
         Route r = routeService.getById(id);

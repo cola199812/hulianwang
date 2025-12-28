@@ -12,6 +12,10 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+/**
+ * 验证码服务实现类
+ * 实现验证码的发送和验证逻辑。
+ */
 public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     // Store codes: Email -> CodeInfo
@@ -38,6 +42,10 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     }
 
     @Override
+    /**
+     * 发送验证码
+     * 生成随机验证码并发送到指定邮箱，包含发送频率限制（1分钟）和有效期（5分钟）。
+     */
     public void sendCode(String email) {
         // 检查发送间隔（1分钟）
         CodeInfo existing = codeStorage.get(email);
@@ -72,6 +80,10 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     }
 
     @Override
+    /**
+     * 验证验证码
+     * 校验验证码是否正确且在有效期内。
+     */
     public boolean verifyCode(String email, String code) {
         CodeInfo info = codeStorage.get(email);
         if (info == null) {

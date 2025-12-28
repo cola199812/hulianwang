@@ -2,15 +2,28 @@ package com.outdoor.demo.entity;
 
 import java.time.LocalDateTime;
 
+/**
+ * 媒体资源实体类
+ * 对应数据库中的media表，存储图片、视频等媒体资源信息。
+ */
 public class Media {
+    /** 媒体资源ID */
     private Long id;
+    /** 上传者用户ID */
     private Long userId;
+    /** 关联的帖子ID */
     private Long postId;
+    /** 媒体类型（如：image, video） */
     private String type;
+    /** 资源URL地址 */
     private String url;
+    /** 缩略图URL地址 */
     private String thumbnailUrl;
+    /** 所属相册 */
     private String album;
+    /** 标签（逗号分隔） */
     private String tags;
+    /** 创建/上传时间 */
     private LocalDateTime createTime;
 
     public Long getId() { return id; }
