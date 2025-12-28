@@ -9,14 +9,15 @@ spring:
     # 数据库用户名
     username: root
     # 数据库密码
-    password: qq2027681066
+    password: Azyl200508
     # 数据库驱动类名
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
-      # 总是初始化数据库结构（会执行schema.sql）
+      # 总是初始化数据库结构和数据
       mode: always
       schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
   jackson:
     # JSON日期格式化配置
     date-format: yyyy-MM-dd HH:mm:ss
