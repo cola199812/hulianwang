@@ -31,4 +31,9 @@ public interface ContentService {
     int countCommentLikes(Long commentId);
     boolean toggleCommentLike(Long commentId, Long userId);
     boolean deletePost(Long postId, Long userId);
+    
+    // Topics & Popularity
+    List<com.outdoor.demo.entity.Topic> listTopics();
+    List<Post> listPopularPosts();
+    void incrementViewCount(Long postId);
 }

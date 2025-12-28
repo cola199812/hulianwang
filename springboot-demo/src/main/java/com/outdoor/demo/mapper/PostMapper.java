@@ -27,4 +27,20 @@ public interface PostMapper {
             "WHERE ST_DISTANCE_SPHERE(POINT(lng, lat), POINT(#{lng}, #{lat})) < #{radius} " +
             "ORDER BY distance ASC")
     List<Post> findNearby(@Param("lat") Double lat, @Param("lng") Double lng, @Param("radius") Double radius);
+
+    @org.apache.ibatis.annotations.Update("UPDATE post SET view_count = view_count + 1 WHERE id = #{id}")
+    void incrementViewCount(Long id);
+
+    @Select("<script>" +
+            "SELECT * FROM post WHERE id IN " +
+            "<foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>" +
+            "#{item}" +
+            "</foreach>" +
+            " ORDER BY FIELD(id, " +
+            "<foreach item='item' index='index' collection='ids' open='' separator=',' close=''>" +
+            "#{item}" +
+            "</foreach>" +
+            ")" +
+            "</script>")
+    List<Post> findByIds(@Param("ids") List<Long> ids);
 }

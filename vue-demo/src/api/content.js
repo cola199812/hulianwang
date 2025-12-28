@@ -75,3 +75,15 @@ export function savePostImages(postId, images) {
 export function savePostVideo(postId, video) {
   return http.post(`/content/post/${postId}/video`, video)
 }
+
+export function listPopularPosts() {
+  return http.get('/content/post/popular')
+}
+
+export function listTopics() {
+  return http.get('/content/topic/list')
+}
+
+export function viewPost(postId) {
+  return http.post(`/content/post/${postId}/view`)
+}

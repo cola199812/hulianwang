@@ -12,6 +12,7 @@ public class Post {
     private Double lng;
     private Integer likeCount;
     private Integer commentCount;
+    private Integer viewCount;
     private String coverUrl;
     private LocalDateTime createTime;
     
@@ -21,6 +22,9 @@ public class Post {
     // 关联的图片和视频
     private java.util.List<PostImage> images;
     private PostVideo video;
+    
+    // 关联的话题
+    private java.util.List<Topic> topics;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -38,8 +42,13 @@ public class Post {
     public void setLng(Double lng) { this.lng = lng; }
     public Integer getLikeCount() { return likeCount; }
     public void setLikeCount(Integer likeCount) { this.likeCount = likeCount; }
+    
     public Integer getCommentCount() { return commentCount; }
     public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
+
+    public Integer getViewCount() { return viewCount; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+
     public String getCoverUrl() { return coverUrl; }
     public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
     public LocalDateTime getCreateTime() { return createTime; }
@@ -52,4 +61,7 @@ public class Post {
     
     public PostVideo getVideo() { return video; }
     public void setVideo(PostVideo video) { this.video = video; }
+    
+    public java.util.List<Topic> getTopics() { return topics; }
+    public void setTopics(java.util.List<Topic> topics) { this.topics = topics; }
 }

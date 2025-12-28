@@ -78,6 +78,22 @@ public class ContentController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/post/popular")
+    public ResponseEntity<?> listPopularPosts() {
+        return ResponseEntity.ok(contentService.listPopularPosts());
+    }
+
+    @GetMapping("/topic/list")
+    public ResponseEntity<?> listTopics() {
+        return ResponseEntity.ok(contentService.listTopics());
+    }
+
+    @PostMapping("/post/{id}/view")
+    public ResponseEntity<?> viewPost(@PathVariable("id") Long id) {
+        contentService.incrementViewCount(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/post/{id}")
     public ResponseEntity<?> getPost(@PathVariable("id") Long id) {
         Post p = contentService.getPost(id);
@@ -86,6 +102,7 @@ public class ContentController {
             body.put("message", "未找到");
             return ResponseEntity.status(404).body(body);
         }
+        contentService.incrementViewCount(id); // Increment view count on fetch
         return ResponseEntity.ok(p);
     }
 
@@ -219,10 +236,15 @@ public class ContentController {
                  String tempPath = tempFile.getAbsolutePath();
                  
                  String videoUrl = video.getVideoUrl();
-                 // If not http, assume object name and construct url (or get presigned GET if needed)
-                 // For now assume public or handled by MinioService
-                 if (!videoUrl.startsWith("http")) {
+                 // Convert to internal URL for ffmpeg
+                 if (videoUrl.startsWith("http")) {
+                     videoUrl = minioService.getInternalUrl(videoUrl);
+                 } else {
+                     // If not http, assume object name and construct url (or get presigned GET if needed)
+                     // For now assume public or handled by MinioService
                      videoUrl = minioService.getObjectUrl(videoUrl); 
+                     // Ensure we use internal url
+                     videoUrl = minioService.getInternalUrl(videoUrl);
                  }
                  
                  boolean success = VideoUtils.generateCover(videoUrl, tempPath);

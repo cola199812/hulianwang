@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 const http = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  // In Docker/Nginx setup, /api will be proxied to backend
+  // For local dev, vite.config.js usually handles proxy or we keep full URL if no proxy
+  baseURL: '/api', 
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' }
 })

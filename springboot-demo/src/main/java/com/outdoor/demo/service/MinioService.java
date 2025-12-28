@@ -8,4 +8,5 @@ public interface MinioService {
     String uploadFile(InputStream stream, String objectName, String contentType);
     String getPresignedUrl(String objectName);
     String getObjectUrl(String objectName);
+    String getInternalUrl(String url);
 }

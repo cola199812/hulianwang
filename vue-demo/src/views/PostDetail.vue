@@ -12,6 +12,13 @@
         <h2 class="mb-2">{{ post.title || '无标题' }}</h2>
         <div class="text-sm text-gray-500 mb-3">{{ post.locationName || '' }}</div>
         <div class="text-base leading-7 whitespace-pre-wrap">{{ post.markdown }}</div>
+        
+        <!-- 话题标签 -->
+        <div v-if="post.topics && post.topics.length" class="mt-4 flex flex-wrap gap-2">
+          <span v-for="t in post.topics" :key="t.id" class="text-blue-500 cursor-pointer hover:underline mr-2">
+            #{{ t.name }}
+          </span>
+        </div>
       </div>
 
       <!-- 附件网格 -->
@@ -60,7 +67,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { getPost, listMediaByPost, postStats, likePost, listComments, addComment, likeComment } from '../api/content'
+import { getPost, listMediaByPost, postStats, likePost, listComments, addComment, likeComment, viewPost } from '../api/content'
 import { userSimple } from '../api/user'
 
 const route = useRoute()
@@ -80,6 +87,10 @@ function fullUrl(u) {
 
 onMounted(async () => {
   const id = route.params.id
+  
+  // 增加浏览量
+  try { await viewPost(id) } catch {}
+
   const { data } = await getPost(id)
   post.value = data
   

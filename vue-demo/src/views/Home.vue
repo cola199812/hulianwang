@@ -96,14 +96,30 @@
     
     <div>
       <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-bold">📝 最新游记</h2>
-        <el-link type="primary" @click="$router.push('/creation')">更多</el-link>
+        <h2 class="text-lg font-bold">📝 探险笔记</h2>
+        <el-button text type="primary" @click="$router.push('/creation')">写游记</el-button>
       </div>
+      
+      <!-- 话题列表 -->
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+        <div v-for="t in topics" :key="t.id" class="bg-gray-100 px-3 py-1 rounded-full text-sm whitespace-nowrap text-gray-600">
+          #{{ t.name }}
+        </div>
+      </div>
+
+      <!-- 标签页 -->
+      <el-tabs v-model="activeTab" @tab-change="handleTabChange" class="mb-4">
+        <el-tab-pane label="最新" name="latest"></el-tab-pane>
+        <el-tab-pane label="热门" name="popular"></el-tab-pane>
+        <el-tab-pane label="附近" name="nearby"></el-tab-pane>
+      </el-tabs>
+
       <div class="masonry">
-        <div v-for="p in posts.slice(0,6)" :key="p.id" class="brick" @click="$router.push(`/post/${p.id}`)">
+        <div v-for="p in posts" :key="p.id" class="brick" @click="$router.push(`/post/${p.id}`)">
           <PostCard :post="p" brief />
         </div>
       </div>
+      <el-empty v-if="posts.length === 0" description="暂无内容" />
     </div>
   </div>
 </template>
@@ -113,30 +129,87 @@ import { ref, onMounted } from 'vue'
 import PostCard from '../components/PostCard.vue'
 import { listRoutes } from '../api/route'
 import { listActivities } from '../api/activity'
-import { listPosts, listMediaByPost } from '../api/content'
+import { listPosts, listMediaByPost, listPopularPosts, listNearbyPosts, listTopics } from '../api/content'
 
 const routes = ref([])
 const activities = ref([])
 const posts = ref([])
+const topics = ref([])
+const activeTab = ref('latest')
 
 async function load() {
   try {
-    const [r, a] = await Promise.all([listRoutes(), listActivities()])
+    const [r, a, t] = await Promise.all([listRoutes(), listActivities(), listTopics()])
     routes.value = r.data || []
     activities.value = a.data || []
-    const { data } = await listPosts()
-    posts.value = data || []
-    for (const p of posts.value) {
-      const res = await listMediaByPost(p.id).catch(()=>null)
-      p._media = res?.data || []
-    }
+    topics.value = t.data || []
+    await loadPosts()
   } catch {}
+}
+
+async function loadPosts() {
+  posts.value = []
+  try {
+    let data = []
+    if (activeTab.value === 'latest') {
+      const res = await listPosts()
+      data = res.data
+    } else if (activeTab.value === 'popular') {
+      const res = await listPopularPosts()
+      data = res.data
+    } else if (activeTab.value === 'nearby') {
+      // 获取位置
+      await new Promise((resolve) => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              const { latitude, longitude } = pos.coords
+              const res = await listNearbyPosts(latitude, longitude, 50000) // 50km
+              data = res.data
+              resolve()
+            },
+            async () => {
+               // 定位失败，默认查全量
+               const res = await listPosts()
+               data = res.data
+               resolve()
+            }
+          )
+        } else {
+           resolve()
+        }
+      })
+      if (!data) { // Fallback if geolocation failed or not supported in time
+         const res = await listPosts()
+         data = res.data
+      }
+    }
+
+    posts.value = data || []
+    // 填充旧媒体数据兼容性 (虽然后端已经enrich，但为了保险)
+    for (const p of posts.value) {
+       // 后端已经做了 enrichPostWithMedia，这里主要是为了兼容旧数据 _media
+       // 但新逻辑下 PostCard 已经处理了 images/video 字段
+       // 仅仅为了兼容旧的 _media 字段逻辑 (PostCard 里还在用)
+       if (!p.images && !p.video) {
+         const res = await listMediaByPost(p.id).catch(()=>null)
+         p._media = res?.data || []
+       }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+function handleTabChange() {
+  loadPosts()
 }
 
 onMounted(load)
 </script>
 
 <style scoped>
+.scrollbar-hide::-webkit-scrollbar { display: none; }
 .masonry { column-count: 3; column-gap: 16px; }
 .brick { break-inside: avoid; margin-bottom: 16px; cursor: pointer; }
 

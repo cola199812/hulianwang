@@ -22,12 +22,38 @@ public class MinioServiceImpl implements MinioService {
     @Value("${minio.endpoint}")
     private String endpoint;
 
+    @Value("${minio.external-endpoint:}")
+    private String externalEndpoint;
+
+    @Value("${minio.access-key}")
+    private String accessKey;
+
+    @Value("${minio.secret-key}")
+    private String secretKey;
+
+    private MinioClient externalClient;
+
     public MinioServiceImpl(MinioClient minioClient) {
         this.minioClient = minioClient;
     }
 
     @PostConstruct
     public void init() {
+        // Initialize external client if endpoint is different
+        if (externalEndpoint != null && !externalEndpoint.isEmpty() && !externalEndpoint.equals(endpoint)) {
+            try {
+                this.externalClient = MinioClient.builder()
+                        .endpoint(externalEndpoint)
+                        .credentials(accessKey, secretKey)
+                        .build();
+            } catch (Exception e) {
+                System.err.println("Failed to init external MinioClient: " + e.getMessage());
+                this.externalClient = this.minioClient;
+            }
+        } else {
+            this.externalClient = this.minioClient;
+        }
+
         ensureBucket();
         setBucketPolicy();
     }
@@ -101,7 +127,7 @@ public class MinioServiceImpl implements MinioService {
     public String getPresignedUrl(String objectName) {
         try {
             ensureBucket();
-            return minioClient.getPresignedObjectUrl(
+            return externalClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
                             .method(Method.PUT)
                             .bucket(bucketName)
@@ -115,8 +141,21 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public String getObjectUrl(String objectName) {
-        // Simple concat for demo. 
-        // If MinIO is on localhost:9000, this returns http://localhost:9000/bucket/object
-        return endpoint + "/" + bucketName + "/" + objectName;
+        // Use external endpoint for frontend access
+        String baseUrl = (externalEndpoint != null && !externalEndpoint.isEmpty()) ? externalEndpoint : endpoint;
+        return baseUrl + "/" + bucketName + "/" + objectName;
+    }
+
+    @Override
+    public String getInternalUrl(String url) {
+        if (url == null) return null;
+        if (externalEndpoint != null && !externalEndpoint.isEmpty() && url.startsWith(externalEndpoint)) {
+            return url.replace(externalEndpoint, endpoint);
+        }
+        // Also handle localhost explicitly just in case externalEndpoint is not set but url is localhost
+        if (url.startsWith("http://localhost:9000")) {
+            return url.replace("http://localhost:9000", endpoint);
+        }
+        return url;
     }
 }

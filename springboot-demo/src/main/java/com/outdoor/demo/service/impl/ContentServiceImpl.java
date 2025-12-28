@@ -16,8 +16,16 @@ import com.outdoor.demo.service.ContentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.outdoor.demo.mapper.TopicMapper;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class ContentServiceImpl implements ContentService {
@@ -28,10 +36,15 @@ public class ContentServiceImpl implements ContentService {
     private final CommentLikeMapper commentLikeMapper;
     private final PostImageMapper postImageMapper;
     private final PostVideoMapper postVideoMapper;
+    private final TopicMapper topicMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private static final String REDIS_KEY_POPULAR = "post:popularity";
 
     public ContentServiceImpl(PostMapper postMapper, MediaMapper mediaMapper,
                               PostLikeMapper postLikeMapper, CommentMapper commentMapper, CommentLikeMapper commentLikeMapper,
-                              PostImageMapper postImageMapper, PostVideoMapper postVideoMapper) {
+                              PostImageMapper postImageMapper, PostVideoMapper postVideoMapper,
+                              TopicMapper topicMapper, RedisTemplate<String, Object> redisTemplate) {
         this.postMapper = postMapper;
         this.mediaMapper = mediaMapper;
         this.postLikeMapper = postLikeMapper;
@@ -39,6 +52,40 @@ public class ContentServiceImpl implements ContentService {
         this.commentLikeMapper = commentLikeMapper;
         this.postImageMapper = postImageMapper;
         this.postVideoMapper = postVideoMapper;
+        this.topicMapper = topicMapper;
+        this.redisTemplate = redisTemplate;
+    }
+
+    private void processTopics(Post post) {
+        if (post.getMarkdown() == null) return;
+        Pattern pattern = Pattern.compile("#(\\S+)");
+        Matcher matcher = pattern.matcher(post.getMarkdown());
+        while (matcher.find()) {
+            String topicName = matcher.group(1);
+            if (topicName.length() > 50) topicName = topicName.substring(0, 50);
+            
+            try {
+                // Find or create topic
+                com.outdoor.demo.entity.Topic topic = topicMapper.findByName(topicName);
+                if (topic == null) {
+                    topic = new com.outdoor.demo.entity.Topic();
+                    topic.setName(topicName);
+                    topicMapper.insert(topic);
+                }
+                // Link post to topic
+                topicMapper.insertPostTopic(post.getId(), topic.getId());
+            } catch (Exception e) {
+                // Ignore duplicates
+            }
+        }
+    }
+
+    private void updatePopularity(Long postId, double scoreDelta) {
+        try {
+            redisTemplate.opsForZSet().incrementScore(REDIS_KEY_POPULAR, postId, scoreDelta);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -46,6 +93,7 @@ public class ContentServiceImpl implements ContentService {
     public Long createPost(Post post) {
         try {
             postMapper.insert(post);
+            processTopics(post);
             return post.getId();
         } catch (Exception e) {
             return null;
@@ -60,6 +108,8 @@ public class ContentServiceImpl implements ContentService {
             if (videos != null && !videos.isEmpty()) {
                 post.setVideo(videos.get(0));
             }
+            // Populate topics
+            post.setTopics(topicMapper.findByPostId(post.getId()));
         } catch (Exception e) {
             // ignore
         }
@@ -192,9 +242,11 @@ public class ContentServiceImpl implements ContentService {
         Integer exists = postLikeMapper.exists(postId, userId);
         if (exists != null && exists > 0) {
             postLikeMapper.delete(postId, userId);
+            updatePopularity(postId, -2.0); // Decrease score
             return false;
         } else {
             postLikeMapper.insert(postId, userId);
+            updatePopularity(postId, 2.0); // Increase score
             return true;
         }
     }
@@ -204,10 +256,44 @@ public class ContentServiceImpl implements ContentService {
     public Long addComment(Comment comment) {
         try {
             commentMapper.insert(comment);
+            updatePopularity(comment.getPostId(), 3.0); // Comment adds 3 points
             return comment.getId();
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @Override
+    public List<com.outdoor.demo.entity.Topic> listTopics() {
+        return topicMapper.findHotTopics();
+    }
+
+    @Override
+    public List<Post> listPopularPosts() {
+        try {
+            // Get top 20 IDs from Redis
+            Set<Object> ids = redisTemplate.opsForZSet().reverseRange(REDIS_KEY_POPULAR, 0, 19);
+            if (ids == null || ids.isEmpty()) {
+                // Fallback to DB if Redis is empty (or initial state)
+                return listRecentPosts(); 
+            }
+            List<Long> postIds = ids.stream()
+                    .map(id -> Long.valueOf(id.toString()))
+                    .collect(Collectors.toList());
+            
+            List<Post> posts = postMapper.findByIds(postIds);
+            enrichPosts(posts);
+            return posts;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public void incrementViewCount(Long postId) {
+        postMapper.incrementViewCount(postId);
+        updatePopularity(postId, 1.0); // View adds 1 point
     }
 
     @Override
