@@ -7,8 +7,33 @@
 ### 1. 环境准备
 - **JDK 17+**
 - **Node.js 16+**
-- **Docker Desktop** (用于运行数据库和中间件)
 - **Maven 3.6+**
+- **Docker Desktop** (必须安装及配置)
+
+#### 🐳 Docker 配置指南 (Windows)
+1. **下载安装**: 访问 [Docker 官网](https://www.docker.com/products/docker-desktop/) 下载并安装 Docker Desktop for Windows。
+2. **启动**: 安装完成后启动 Docker Desktop，等待左下角状态变为绿色 (Engine running)。
+3. **配置镜像源** (推荐):
+   为了加快镜像下载速度，建议配置国内镜像源。
+   - 打开设置 (齿轮图标) -> **Docker Engine**
+   - 修改 JSON 配置如下：
+     ```json
+     {
+       "builder": {
+         "gc": {
+           "defaultKeepStorage": "20GB",
+           "enabled": true
+         }
+       },
+       "experimental": false,
+       "registry-mirrors": [
+         "https://docker.m.daocloud.io",
+         "https://docker.1panel.live"
+       ]
+     }
+     ```
+   - 点击 **Apply & restart** 保存并重启。
+4. **验证**: 打开终端 (PowerShell) 输入 `docker -v`，显示版本号即为成功。
 
 ### 2. 启动基础设施
 项目依赖 MySQL, Redis 和 MinIO。我们使用 Docker Compose 快速启动这些服务。
@@ -22,7 +47,24 @@ docker-compose up -d
 - **Redis**: 端口 6379
 - **MinIO**: 控制台端口 9001 (账号 root / 密码 qq2027681066)
 
-### 3. 运行后端 (Spring Boot)
+### 3. 给别人使用（一键配置）
+
+如果您想把这个项目分享给同学或老师，且不希望他们手动配置复杂的数据库账号密码，请按照以下步骤：
+
+1. **打包项目**: 将整个项目文件夹（包含 `setup.bat` 和 `docker-compose.yml`）压缩发送给对方。
+2. **对方操作**:
+   - 对方只需安装好 Docker Desktop。
+   - 双击运行项目根目录下的 **`setup.bat`**。
+   
+   脚本会自动：
+   - 检查 Docker 是否安装。
+   - 自动拉取并启动 MySQL, Redis, MinIO。
+   - 自动配置好所有账号密码（默认配置在 `docker-compose.yml` 中，对方无需修改）。
+
+3. **运行代码**:
+   环境启动后，对方只需像往常一样运行后端 (Idea/Maven) 和前端 (VSCode/Npm) 即可，无需关心数据库配置。
+
+### 4. 运行后端 (Spring Boot)
 1. 进入后端目录：
    ```bash
    cd springboot-demo
@@ -35,7 +77,7 @@ docker-compose up -d
    
    *后端服务将在 http://localhost:8080 启动*
 
-### 4. 运行前端 (Vue 3)
+### 5. 运行前端 (Vue 3)
 1. 进入前端目录：
    ```bash
    cd vue-demo
