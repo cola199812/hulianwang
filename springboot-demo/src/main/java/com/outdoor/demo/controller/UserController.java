@@ -141,8 +141,47 @@ public class UserController {
         Map<String, Object> body = new HashMap<>();
         body.put("id", u.getId());
         body.put("username", u.getUsername());
+        body.put("email", u.getEmail());
+        body.put("nickname", u.getNickname());
+        body.put("avatarUrl", u.getAvatarUrl());
+        body.put("gender", u.getGender());
+        body.put("birthday", u.getBirthday());
+        body.put("bio", u.getBio());
+        body.put("phone", u.getPhone());
         body.put("createTime", u.getCreateTime());
         return ResponseEntity.ok(body);
+    }
+
+    /**
+     * 更新用户个人信息
+     *
+     * @param user 用户信息
+     * @param session HTTP会话
+     * @return 更新结果
+     */
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@RequestBody User user, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+        
+        // 确保只能更新自己的信息
+        user.setId((Long) uid);
+        
+        try {
+            User updatedUser = userService.updateUserProfile(user);
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "个人信息更新成功");
+            body.put("user", updatedUser);
+            return ResponseEntity.ok(body);
+        } catch (RuntimeException e) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(body);
+        }
     }
 
     /**

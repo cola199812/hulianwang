@@ -3,6 +3,7 @@ E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\PersonalEqu
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\ActivityCreateRequest.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\Activity.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\User.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\NotificationService.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\RouteService.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\controller\UserController.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\EquipmentChecklist.java
@@ -22,15 +23,20 @@ E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\Equipment.ja
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\PersonalEquipmentMapper.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\RouteCreateRequest.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\EquipmentChecklistMapper.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\TestUserTable.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\CheckUserTable.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\Comment.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\EquipmentChecklistItemMapper.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\ContentService.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\EquipmentRentalService.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\config\CorsConfig.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\TestDatabase.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\EquipmentRental.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\EquipmentRentalRequest.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\PostLikeMapper.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\CommentMapper.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\controller\NotificationController.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\NotificationMapper.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\mapper\ActivityMapper.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\DemoApplication.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\impl\ActivityServiceImpl.java
@@ -57,4 +63,5 @@ E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\service\impl\Verifi
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\controller\EquipmentController.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\CommentLike.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\controller\ContentController.java
+E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\Notification.java
 E:\hulianwang\springboot-demo\src\main\java\com\outdoor\demo\entity\PersonalEquipment.java

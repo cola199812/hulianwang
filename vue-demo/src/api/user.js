@@ -27,3 +27,7 @@ export function logout() {
 export function resetPassword(email, verificationCode, newPassword) {
   return http.post('/user/reset-password', { email, verificationCode, newPassword })
 }
+
+export function updateUserProfile(userInfo) {
+  return http.put('/user/profile', userInfo)
+}

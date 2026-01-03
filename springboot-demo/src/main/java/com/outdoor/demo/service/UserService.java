@@ -37,5 +37,12 @@ public interface UserService {
      * @param newPassword 新密码
      */
     void resetPassword(String email, String code, String newPassword);
+
+    /**
+     * 更新用户个人信息
+     * @param user 用户对象
+     * @return 更新后的用户对象
+     */
+    User updateUserProfile(User user);
 }
 

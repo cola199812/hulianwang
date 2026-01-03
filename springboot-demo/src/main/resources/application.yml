@@ -1,11 +1,11 @@
 server:
-  # 服务端口号，启动后可以通过 http://localhost:8080 访问
+  # 服务端口号，启动后可以通过 http://localhost:8081 访问
   port: 8080
 
 spring:
   datasource:
     # 数据库连接URL，包含数据库名、时区、字符集等配置
-    url: jdbc:mysql://localhost:3306/outdoor_demo?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/outdoor_demo?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true
     # 数据库用户名
     username: root
     # 数据库密码

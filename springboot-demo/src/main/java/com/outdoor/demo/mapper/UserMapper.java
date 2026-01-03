@@ -53,5 +53,13 @@ public interface UserMapper {
      */
     @org.apache.ibatis.annotations.Update("UPDATE user SET password = #{password} WHERE email = #{email}")
     int updatePassword(@org.apache.ibatis.annotations.Param("email") String email, @org.apache.ibatis.annotations.Param("password") String password);
+
+    /**
+     * 更新用户个人信息
+     * @param user 用户对象
+     * @return 影响行数
+     */
+    @org.apache.ibatis.annotations.Update("UPDATE user SET nickname = #{nickname}, avatar_url = #{avatarUrl}, gender = #{gender}, birthday = #{birthday}, bio = #{bio}, phone = #{phone} WHERE id = #{id}")
+    int updateUserProfile(User user);
 }
 

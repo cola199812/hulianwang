@@ -1,10 +1,20 @@
 -- 用户表
-CREATE TABLE IF NOT EXISTS `user` (
-  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-  `username` VARCHAR(64) NOT NULL UNIQUE,
-  `password` VARCHAR(100) NOT NULL,
-  `email` VARCHAR(100) NOT NULL UNIQUE,
-  `create_time` DATETIME NOT NULL
+-- 暂时禁用外键检查
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS user;
+CREATE TABLE IF NOT EXISTS user (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  username VARCHAR(64) NOT NULL UNIQUE,
+  password VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL UNIQUE,
+  nickname VARCHAR(64) NULL,
+  avatar_url VARCHAR(255) NULL,
+  gender VARCHAR(10) NULL,
+  birthday DATE NULL,
+  bio TEXT NULL,
+  phone VARCHAR(11) NULL,
+  create_time DATETIME NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `post` (
@@ -132,3 +142,18 @@ CREATE TABLE IF NOT EXISTS `personal_equipment` (
   `note` VARCHAR(255) NULL,
   FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 通知表
+CREATE TABLE IF NOT EXISTS `notification` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `content` TEXT NOT NULL,
+  `type` VARCHAR(32) NOT NULL DEFAULT 'system', -- system, activity
+  `is_read` BOOLEAN NOT NULL DEFAULT FALSE,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 重新启用外键检查
+SET FOREIGN_KEY_CHECKS = 1;

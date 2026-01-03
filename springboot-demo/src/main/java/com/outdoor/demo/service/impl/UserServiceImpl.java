@@ -94,5 +94,15 @@ public class UserServiceImpl implements UserService {
         }
         userMapper.updatePassword(email, encoder.encode(newPassword));
     }
+
+    @Override
+    /**
+     * 更新用户个人信息
+     * 更新用户的昵称、头像、性别、生日、简介和手机号。
+     */
+    public User updateUserProfile(User user) {
+        userMapper.updateUserProfile(user);
+        return userMapper.findById(user.getId());
+    }
 }
 
