@@ -100,6 +100,16 @@ CREATE TABLE IF NOT EXISTS `post_topic` (
   PRIMARY KEY (`post_id`, `topic_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS `notification` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `type` VARCHAR(50) NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `content` TEXT NOT NULL,
+  `read_status` TINYINT NOT NULL DEFAULT 0,
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `media` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
@@ -336,14 +346,13 @@ VALUES
 ON DUPLICATE KEY UPDATE
 `name`=VALUES(`name`), `route_id`=VALUES(`route_id`), `time`=VALUES(`time`), `max_people`=VALUES(`max_people`), `creator_id`=VALUES(`creator_id`);
 
-INSERT INTO `topic` (`id`, `name`)
+INSERT IGNORE INTO `topic` (`id`, `name`)
 VALUES
 (1, '徒步'),
 (2, '露营'),
 (3, '跑步'),
 (4, '登山'),
-(5, '城市漫步')
-ON DUPLICATE KEY UPDATE `name`=VALUES(`name`);
+(5, '城市漫步');
 
 INSERT INTO `post` (`id`, `user_id`, `title`, `markdown`, `location_name`, `lat`, `lng`, `like_count`, `comment_count`, `view_count`, `cover_url`, `create_time`)
 VALUES
