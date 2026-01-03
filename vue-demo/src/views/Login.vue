@@ -36,6 +36,9 @@
                   {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
                 </el-button>
               </div>
+              <div v-if="expiryCountdown > 0" style="margin-top: 6px; font-size: 12px; color: #27ae60;">
+                验证码有效期：{{ formatExpiry(expiryCountdown) }}
+              </div>
             </el-form-item>
             <el-form-item>
               <el-input v-model="regForm.password" type="password" placeholder="密码" :prefix-icon="Lock" show-password />
@@ -59,6 +62,8 @@ const router = useRouter()
 const activeTab = ref('login')
 const loading = ref(false)
 const countdown = ref(0)
+const expiryCountdown = ref(0)
+let expiryTimer = null
 
 const form = reactive({
   username: '',
@@ -94,11 +99,20 @@ async function sendVerificationCode() {
 
   try {
     await sendCode(regForm.email)
-    ElMessage.success('验证码已发送（请查看后端控制台）')
+    ElMessage.success('验证码已发送（有效期5分钟）')
     countdown.value = 60
     const timer = setInterval(() => {
       countdown.value--
       if (countdown.value <= 0) clearInterval(timer)
+    }, 1000)
+    if (expiryTimer) clearInterval(expiryTimer)
+    expiryCountdown.value = 300
+    expiryTimer = setInterval(() => {
+      expiryCountdown.value--
+      if (expiryCountdown.value <= 0) {
+        clearInterval(expiryTimer)
+        expiryTimer = null
+      }
     }, 1000)
   } catch (e) {
     ElMessage.error(e.response?.data?.message || '发送失败')
@@ -108,6 +122,9 @@ async function sendVerificationCode() {
 async function handleRegister() {
   if (!regForm.username || !regForm.password || !regForm.email || !regForm.verificationCode) {
     return ElMessage.warning('请填写完整信息')
+  }
+  if (expiryCountdown.value <= 0) {
+    return ElMessage.warning('验证码已过期，请重新发送')
   }
   loading.value = true
   try {
@@ -121,11 +138,17 @@ async function handleRegister() {
     loading.value = false
   }
 }
+
+function formatExpiry(s) {
+  const m = Math.floor(s / 60)
+  const sec = s % 60
+  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+}
 </script>
 
 <style scoped>
 /* 统一绿色主题 */
-:root {
+:global(:root) {
   --primary-green: #2e7d32;
   --primary-green-dark: #1b5e20;
   --primary-green-light: #388e3c;
@@ -169,6 +192,7 @@ async function handleRegister() {
   border-radius: 12px;
   padding: 14px 0;
   font-size: 16px;
+  color: #fff;
   background: var(--primary-green);
   border-color: var(--primary-green);
   box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);

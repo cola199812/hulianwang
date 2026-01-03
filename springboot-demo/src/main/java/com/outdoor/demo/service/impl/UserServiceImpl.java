@@ -1,17 +1,20 @@
 package com.outdoor.demo.service.impl;
 
+import java.time.LocalDateTime;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.outdoor.demo.entity.User;
 import com.outdoor.demo.entity.UserRegisterRequest;
 import com.outdoor.demo.mapper.UserMapper;
 import com.outdoor.demo.service.UserService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.time.LocalDateTime;
 
 @Service
+/**
+ * 用户服务实现类
+ * 实现用户注册、登录、信息管理等业务逻辑。
+ */
 public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -23,6 +26,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    /**
+     * 用户注册
+     * 校验验证码、用户名/邮箱唯一性，加密密码后保存用户。
+     */
     public User register(UserRegisterRequest req) {
         if (!verificationCodeService.verifyCode(req.getEmail(), req.getVerificationCode())) {
             throw new RuntimeException("验证码无效或已过期");
@@ -44,20 +51,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    /**
+     * 用户登录
+     * 验证用户名和密码。
+     */
     public User login(String username, String password) {
+        System.out.println("Login attempt for username: " + username);
         User user = userMapper.findByUsernameOrPhoneOrEmail(username);
-        if (user != null && encoder.matches(password, user.getPassword())) {
-            return user;
+        if (user != null) {
+            System.out.println("User found: " + user.getUsername());
+            System.out.println("Stored password: " + user.getPassword());
+            System.out.println("Password match: " + encoder.matches(password, user.getPassword()));
+            if (encoder.matches(password, user.getPassword())) {
+                return user;
+            }
+        } else {
+            System.out.println("User not found");
         }
         return null;
     }
 
     @Override
+    /**
+     * 根据ID获取用户
+     */
     public User getById(Long id) {
         return userMapper.findById(id);
     }
 
     @Override
+    /**
+     * 重置密码
+     * 校验验证码，更新用户密码。
+     */
     public void resetPassword(String email, String code, String newPassword) {
         if (!verificationCodeService.verifyCode(email, code)) {
             throw new RuntimeException("验证码无效或已过期");
@@ -67,6 +93,16 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("该邮箱未注册");
         }
         userMapper.updatePassword(email, encoder.encode(newPassword));
+    }
+
+    @Override
+    /**
+     * 更新用户个人信息
+     * 更新用户的昵称、头像、性别、生日、简介和手机号。
+     */
+    public User updateUserProfile(User user) {
+        userMapper.updateUserProfile(user);
+        return userMapper.findById(user.getId());
     }
 }
 

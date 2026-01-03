@@ -2,7 +2,10 @@
   <div class="p-4" style="max-width: 1000px; margin: 0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h1 class="text-xl font-bold mb-4">活动社交</h1>
-      <el-button @click="$router.push('/activities')">活动列表</el-button>
+      <div style="display:flex; gap:8px;">
+        <el-button :loading="loading" @click="load">刷新</el-button>
+        <el-button @click="$router.push('/activities')">活动列表</el-button>
+      </div>
     </div>
 
     <div class="grid">
@@ -11,19 +14,43 @@
           <div class="title">热门活动</div>
           <el-link type="primary" @click="$router.push('/activities')">全部</el-link>
         </div>
-        <div class="activity-grid">
+        <el-skeleton v-if="loading" :rows="6" animated />
+        <div v-else-if="list.length === 0" style="margin: 16px 0;">
+          <el-empty description="暂无活动" />
+        </div>
+        <div v-else class="activity-grid">
           <div v-for="a in list.slice(0,6)" :key="a.id" class="activity-card">
             <div class="activity-cover">{{ (a.name || '').slice(0,1) }}</div>
             <div class="activity-title">{{ a.name }}</div>
-            <div class="activity-meta">{{ a.time }} · {{ a.currentPeople }}/{{ a.maxPeople }} 人</div>
-            <el-button size="small" type="success" @click="join(a.id)">报名</el-button>
+            <div class="activity-meta">{{ formatTime(a.time) }} · {{ a.currentPeople }}/{{ a.maxPeople }} 人</div>
+            <el-button
+              v-if="!isJoined(a.id)"
+              size="small"
+              type="success"
+              :disabled="Number(a.currentPeople) >= Number(a.maxPeople)"
+              @click="join(a.id)"
+            >
+              {{ Number(a.currentPeople) >= Number(a.maxPeople) ? '已满' : '报名' }}
+            </el-button>
+            <el-button
+              v-else
+              size="small"
+              type="warning"
+              @click="cancelJoin(a.id)"
+            >
+              取消报名
+            </el-button>
           </div>
         </div>
         <div class="section-head">
           <div class="title">最新游记</div>
           <el-link type="primary" @click="$router.push('/creation')">更多</el-link>
         </div>
-        <div class="masonry">
+        <el-skeleton v-if="loading" :rows="6" animated />
+        <div v-else-if="posts.length === 0" style="margin: 16px 0;">
+          <el-empty description="暂无游记" />
+        </div>
+        <div v-else class="masonry">
           <div v-for="p in posts.slice(0,6)" :key="p.id" class="brick" @click="$router.push(`/post/${p.id}`)">
             <PostCard :post="p" brief />
           </div>
@@ -32,8 +59,12 @@
       <div class="right">
         <el-card>
           <div class="title">附近路线</div>
-          <div class="sidebar-list">
-            <div v-for="r in routes.slice(0,5)" :key="r.id" class="sidebar-item">
+          <el-skeleton v-if="loading" :rows="4" animated />
+          <div v-else-if="routes.length === 0" style="margin: 12px 0;">
+            <el-empty description="暂无路线" :image-size="80" />
+          </div>
+          <div v-else class="sidebar-list">
+            <div v-for="r in routes.slice(0,5)" :key="r.id" class="sidebar-item" @click="$router.push('/discover')">
               <div class="name">{{ r.name }}</div>
               <div class="meta">{{ r.distance }} km · {{ r.level }}</div>
             </div>
@@ -47,7 +78,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { listActivities, joinActivity } from '../api/activity'
+import { listActivities, joinActivity, cancelJoin as cancelJoinActivity, listMyActivities, checkIfJoined } from '../api/activity'
 import { ElMessage } from 'element-plus'
 import { listRoutes } from '../api/route'
 import { listPosts, listMediaByPost } from '../api/content'
@@ -56,20 +87,32 @@ import PostCard from '../components/PostCard.vue'
 const list = ref([])
 const routes = ref([])
 const posts = ref([])
+const loading = ref(false)
+const joinedActivities = ref(new Set()) // 记录已报名的活动ID
 
 async function load() {
+  loading.value = true
   try {
-    const { data } = await listActivities()
-    list.value = data || []
-    const { data: r } = await listRoutes()
-    routes.value = r || []
-    const { data: p } = await listPosts()
-    posts.value = p || []
-    for (const x of posts.value) {
-      const res = await listMediaByPost(x.id).catch(()=>null)
-      x._media = res?.data || []
+    const [aRes, rRes, pRes] = await Promise.allSettled([listActivities(), listRoutes(), listPosts()])
+    list.value = aRes.status === 'fulfilled' ? (aRes.value.data || []) : []
+    routes.value = rRes.status === 'fulfilled' ? (rRes.value.data || []) : []
+    posts.value = pRes.status === 'fulfilled' ? (pRes.value.data || []) : []
+
+    const needMedia = posts.value.slice(0, 6).filter(p => !p.images && !p.video)
+    if (needMedia.length) {
+      await Promise.allSettled(
+        needMedia.map(async (p) => {
+          const res = await listMediaByPost(p.id)
+          p._media = res?.data || []
+        })
+      )
     }
-  } catch {}
+    
+    // 更新已报名活动状态
+    await updateJoinedActivities()
+  } finally {
+    loading.value = false
+  }
 }
 
 async function join(id) {
@@ -78,8 +121,47 @@ async function join(id) {
     await load()
     ElMessage.success('报名成功')
   } catch (e) {
-    ElMessage.error('报名失败，可能未登录或人数已满')
+    ElMessage.error(e.response?.data?.message || '报名失败，可能未登录或人数已满')
   }
+}
+
+async function cancelJoin(id) {
+  try {
+    await cancelJoinActivity(id)
+    await load()
+    ElMessage.success('取消报名成功')
+  } catch (e) {
+    ElMessage.error(e.response?.data?.message || '取消报名失败')
+  }
+}
+
+function isJoined(activityId) {
+  return joinedActivities.value.has(activityId)
+}
+
+async function updateJoinedActivities() {
+  // 检查每个活动用户是否已报名
+  const joinedIds = new Set()
+  
+  for (const activity of list.value) {
+    try {
+      const isJoined = await checkIfJoined(activity.id)
+      if (isJoined) {
+        joinedIds.add(activity.id)
+      }
+    } catch (error) {
+      console.error(`检查活动 ${activity.id} 报名状态失败:`, error)
+    }
+  }
+  
+  joinedActivities.value = joinedIds
+}
+
+function formatTime(time) {
+  if (!time) return ''
+  const date = new Date(time)
+  if (isNaN(date.getTime())) return String(time)
+  return date.toLocaleString()
 }
 
 onMounted(load)

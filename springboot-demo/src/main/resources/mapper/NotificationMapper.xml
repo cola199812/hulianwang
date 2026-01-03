@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.outdoor.demo.mapper.NotificationMapper">
+    <resultMap id="NotificationMap" type="com.outdoor.demo.entity.Notification">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="read" column="read_status"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.outdoor.demo.entity.Notification" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO notification (user_id, type, title, content, read_status, create_time)
+        VALUES (#{userId}, #{type}, #{title}, #{content}, #{read}, NOW())
+    </insert>
+
+    <select id="findByUserId" resultMap="NotificationMap">
+        SELECT id, user_id, type, title, content, read_status, create_time
+        FROM notification
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findByUserIdAndType" resultMap="NotificationMap">
+        SELECT id, user_id, type, title, content, read_status, create_time
+        FROM notification
+        WHERE user_id = #{userId} AND type = #{type}
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="markAsRead" parameterType="long">
+        UPDATE notification
+        SET read_status = 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="markAllAsRead" parameterType="long">
+        UPDATE notification
+        SET read_status = 1
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM notification WHERE id = #{id}
+    </delete>
+</mapper>

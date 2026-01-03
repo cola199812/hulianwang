@@ -28,12 +28,19 @@ public class ActivityController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> create(@Valid @RequestBody ActivityCreateRequest req) {
+    public ResponseEntity<?> create(@Valid @RequestBody ActivityCreateRequest req, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
         Activity a = new Activity();
         a.setName(req.getName());
         a.setRouteId(req.getRouteId());
         a.setTime(LocalDateTime.parse(req.getTime(), formatter));
         a.setMaxPeople(req.getMaxPeople());
+        a.setCreatorId((Long) uid);
         Long id = activityService.create(a);
         Map<String, Object> body = new HashMap<>();
         body.put("id", id);
@@ -65,5 +72,76 @@ public class ActivityController {
             return ResponseEntity.badRequest().body(body);
         }
     }
-}
 
+    @GetMapping("/my-activities")
+    public ResponseEntity<?> listMyActivities(HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+
+        List<Map<String, Object>> activities = activityService.listMyActivities((Long) uid);
+        return ResponseEntity.ok(activities);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateActivity(@PathVariable("id") Long id,
+            @Valid @RequestBody ActivityCreateRequest req,
+            HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+
+        Activity activity = new Activity();
+        activity.setName(req.getName());
+        activity.setRouteId(req.getRouteId());
+        activity.setTime(LocalDateTime.parse(req.getTime(), formatter));
+        activity.setMaxPeople(req.getMaxPeople());
+
+        activityService.updateActivity(id, activity);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "更新成功");
+        return ResponseEntity.ok(body);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteActivity(@PathVariable("id") Long id, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+
+        activityService.deleteActivity(id);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "删除成功");
+        return ResponseEntity.ok(body);
+    }
+
+    @DeleteMapping("/cancel-join")
+    public ResponseEntity<?> cancelJoin(@RequestBody ActivityJoinRequest req, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+        boolean ok = activityService.cancelJoin(req.getActivityId(), (Long) uid);
+        Map<String, Object> body = new HashMap<>();
+        if (ok) {
+            body.put("message", "取消报名成功");
+            return ResponseEntity.ok(body);
+        } else {
+            body.put("message", "取消报名失败，可能未报名该活动");
+            return ResponseEntity.badRequest().body(body);
+        }
+    }
+}

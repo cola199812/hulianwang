@@ -23,5 +23,9 @@
     <select id="findAll" resultMap="RouteMap">
         SELECT id, name, distance, level, description, creator_id FROM route ORDER BY id DESC
     </select>
+
+    <select id="findMyRoutes" parameterType="long" resultMap="RouteMap">
+        SELECT id, name, distance, level, description, creator_id FROM route WHERE creator_id = #{creatorId} ORDER BY id DESC
+    </select>
 </mapper>
 

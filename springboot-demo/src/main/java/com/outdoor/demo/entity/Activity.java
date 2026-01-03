@@ -8,6 +8,7 @@ public class Activity {
     private Long routeId;
     private LocalDateTime time;
     private Integer maxPeople;
+    private Long creatorId;
 
     public Long getId() {
         return id;
@@ -48,5 +49,12 @@ public class Activity {
     public void setMaxPeople(Integer maxPeople) {
         this.maxPeople = maxPeople;
     }
-}
 
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+}

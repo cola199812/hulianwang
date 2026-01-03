@@ -11,5 +11,9 @@ public interface ActivityMapper {
     int insert(Activity activity);
     Activity findById(@Param("id") Long id);
     List<Activity> findAll();
+    
+    List<Activity> findMyActivities(@Param("creatorId") Long creatorId);
+    int update(Activity activity);
+    int deleteById(@Param("id") Long id);
 }
 

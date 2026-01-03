@@ -75,7 +75,7 @@ docker-compose up -d
    ```
    或者使用 IDEA 打开 `springboot-demo` 目录，运行 `DemoApplication` 类。
    
-   *后端服务将在 http://localhost:8080 启动*
+   *后端服务将在 http://localhost:8081 启动*
 
 ### 5. 运行前端 (Vue 3)
 1. 进入前端目录：
@@ -91,11 +91,11 @@ docker-compose up -d
    npm run dev
    ```
    
-   *前端页面通常在 http://localhost:5173 访问*
+   *前端页面通常在 http://localhost:5176 访问*
 
 ## 📝 访问地址
-- **前端页面**: [http://localhost:5173](http://localhost:5173)
-- **后端 API 文档**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) (如果有集成 Swagger)
+- **前端页面**: [http://localhost:5176](http://localhost:5176)
+- **后端 API 服务**: [http://localhost:8081](http://localhost:8081)
 - **MinIO 控制台**: [http://localhost:9001](http://localhost:9001)
 
 ## 📁 目录结构

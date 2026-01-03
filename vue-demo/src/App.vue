@@ -37,7 +37,7 @@ const showNav = computed(
 </script>
 
 <style scoped>
-/* 整体布局 */
+:global(:root) { --el-color-primary: #27ae60; }
 .layout {
   min-height: 100vh;
   background: linear-gradient(180deg, #f2fbf5, #ffffff);

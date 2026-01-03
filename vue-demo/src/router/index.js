@@ -32,7 +32,7 @@ const routes = [
   { path: '/gear', component: Gear, meta: { requiresAuth: true } },
   { path: '/tools', component: Tools, meta: { requiresAuth: true } },
   { path: '/notification', component: Notification, meta: { requiresAuth: true } },
-  { path: '/profile', component: Profile, meta: { requiresAuth: true } }
+  { path: '/profile', component: Profile, meta: { requiresAuth: false } }
 ]
 
 const router = createRouter({

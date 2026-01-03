@@ -30,9 +30,11 @@ CREATE TABLE IF NOT EXISTS activity (
   name VARCHAR(100) NOT NULL,
   route_id BIGINT NOT NULL,
   time DATETIME NOT NULL,
-  max_people INT NOT NULL
+  max_people INT NOT NULL,
+  creator_id BIGINT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE INDEX idx_activity_route ON activity(route_id);
+CREATE INDEX idx_activity_creator ON activity(creator_id);
 
 -- 活动成员表
 CREATE TABLE IF NOT EXISTS activity_user (
@@ -42,4 +44,18 @@ CREATE TABLE IF NOT EXISTS activity_user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 CREATE UNIQUE INDEX idx_activity_user_unique ON activity_user(activity_id, user_id);
 CREATE INDEX idx_activity_user_activity ON activity_user(activity_id);
+
+-- 通知表
+CREATE TABLE IF NOT EXISTS notification (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  type VARCHAR(20) NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content TEXT NOT NULL,
+  read_status TINYINT(1) DEFAULT 0,
+  create_time DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE INDEX idx_notification_user ON notification(user_id);
+CREATE INDEX idx_notification_type ON notification(type);
+CREATE INDEX idx_notification_create_time ON notification(create_time);
 

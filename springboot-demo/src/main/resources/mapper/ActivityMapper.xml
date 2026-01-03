@@ -8,19 +8,40 @@
         <result property="routeId" column="route_id"/>
         <result property="time" column="time"/>
         <result property="maxPeople" column="max_people"/>
+        <result property="creatorId" column="creator_id"/>
     </resultMap>
 
     <insert id="insert" parameterType="com.outdoor.demo.entity.Activity" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO activity (name, route_id, time, max_people)
-        VALUES (#{name}, #{routeId}, #{time}, #{maxPeople})
+        INSERT INTO activity (name, route_id, time, max_people, creator_id)
+        VALUES (#{name}, #{routeId}, #{time}, #{maxPeople}, #{creatorId})
     </insert>
 
     <select id="findById" parameterType="long" resultMap="ActivityMap">
-        SELECT id, name, route_id, time, max_people FROM activity WHERE id = #{id}
+        SELECT id, name, route_id, time, max_people, creator_id FROM activity WHERE id = #{id}
     </select>
 
     <select id="findAll" resultMap="ActivityMap">
-        SELECT id, name, route_id, time, max_people FROM activity ORDER BY id DESC
+        SELECT id, name, route_id, time, max_people, creator_id FROM activity ORDER BY id DESC
     </select>
+    
+    <select id="findMyActivities" parameterType="long" resultMap="ActivityMap">
+        SELECT id, name, route_id, time, max_people, creator_id
+        FROM activity
+        WHERE creator_id = #{creatorId}
+        ORDER BY id DESC
+    </select>
+    
+    <update id="update" parameterType="com.outdoor.demo.entity.Activity">
+        UPDATE activity
+        SET
+            name = #{name},
+            route_id = #{routeId},
+            time = #{time},
+            max_people = #{maxPeople}
+        WHERE id = #{id}
+    </update>
+    
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM activity WHERE id = #{id}
+    </delete>
 </mapper>
-

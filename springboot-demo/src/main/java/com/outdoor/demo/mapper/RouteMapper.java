@@ -9,7 +9,14 @@ import java.util.List;
 @Mapper
 public interface RouteMapper {
     int insert(Route route);
-    Route findById(@Param("id") Long id);
-    List<Route> findAll();
-}
 
+    Route findById(@Param("id") Long id);
+
+    List<Route> findAll();
+
+    List<Route> findMyRoutes(@Param("creatorId") Long creatorId);
+
+    int update(Route route);
+
+    int deleteById(@Param("id") Long id);
+}
