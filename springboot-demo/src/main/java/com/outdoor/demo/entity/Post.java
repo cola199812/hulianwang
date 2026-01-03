@@ -26,6 +26,10 @@ public class Post {
     // 关联的话题
     private java.util.List<Topic> topics;
 
+    // 当前用户是否已点赞
+    @org.springframework.data.annotation.Transient
+    private Boolean isLiked;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getUserId() { return userId; }
@@ -64,4 +68,7 @@ public class Post {
     
     public java.util.List<Topic> getTopics() { return topics; }
     public void setTopics(java.util.List<Topic> topics) { this.topics = topics; }
+
+    public Boolean getIsLiked() { return isLiked; }
+    public void setIsLiked(Boolean isLiked) { this.isLiked = isLiked; }
 }

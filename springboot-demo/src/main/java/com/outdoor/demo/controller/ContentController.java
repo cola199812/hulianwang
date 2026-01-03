@@ -57,8 +57,10 @@ public class ContentController {
     }
 
     @GetMapping("/post/list")
-    public ResponseEntity<?> listPosts() {
-        List<Post> list = contentService.listRecentPosts();
+    public ResponseEntity<?> listPosts(HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        List<Post> list = contentService.listRecentPosts(userId);
         return ResponseEntity.ok(list);
     }
 
@@ -66,21 +68,26 @@ public class ContentController {
     public ResponseEntity<?> listMyPosts(HttpSession session) {
         Object uid = session.getAttribute("userId");
         Long userId = uid instanceof Long ? (Long) uid : 0L;
-        List<Post> list = contentService.listUserPosts(userId);
+        List<Post> list = contentService.listUserPosts(userId, userId);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/post/nearby")
     public ResponseEntity<?> listNearbyPosts(@RequestParam("lat") Double lat,
                                              @RequestParam("lng") Double lng,
-                                             @RequestParam(value = "radius", defaultValue = "5000") Double radius) {
-        List<Post> list = contentService.listNearbyPosts(lat, lng, radius);
+                                             @RequestParam(value = "radius", defaultValue = "5000") Double radius,
+                                             HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        List<Post> list = contentService.listNearbyPosts(lat, lng, radius, userId);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/post/popular")
-    public ResponseEntity<?> listPopularPosts() {
-        return ResponseEntity.ok(contentService.listPopularPosts());
+    public ResponseEntity<?> listPopularPosts(HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        return ResponseEntity.ok(contentService.listPopularPosts(userId));
     }
 
     @GetMapping("/topic/list")
@@ -95,8 +102,10 @@ public class ContentController {
     }
 
     @GetMapping("/post/{id}")
-    public ResponseEntity<?> getPost(@PathVariable("id") Long id) {
-        Post p = contentService.getPost(id);
+    public ResponseEntity<?> getPost(@PathVariable("id") Long id, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        Post p = contentService.getPost(id, userId);
         if (p == null) {
             Map<String, Object> body = new HashMap<>();
             body.put("message", "未找到");
@@ -126,8 +135,10 @@ public class ContentController {
     }
 
     @GetMapping("/comment/list/{postId}")
-    public ResponseEntity<?> listComments(@PathVariable("postId") Long postId) {
-        List<Comment> list = contentService.listCommentsByPost(postId);
+    public ResponseEntity<?> listComments(@PathVariable("postId") Long postId, HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        Long userId = uid instanceof Long ? (Long) uid : 0L;
+        List<Comment> list = contentService.listCommentsByPost(postId, userId);
         return ResponseEntity.ok(list);
     }
 

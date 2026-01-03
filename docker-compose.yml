@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   mysql:
     image: m.daocloud.io/docker.io/library/mysql:8.0

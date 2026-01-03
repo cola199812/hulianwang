@@ -57,13 +57,32 @@ public class ContentServiceImpl implements ContentService {
     }
 
     private void processTopics(Post post) {
-        if (post.getMarkdown() == null) return;
-        Pattern pattern = Pattern.compile("#(\\S+)");
-        Matcher matcher = pattern.matcher(post.getMarkdown());
-        while (matcher.find()) {
-            String topicName = matcher.group(1);
-            if (topicName.length() > 50) topicName = topicName.substring(0, 50);
-            
+        java.util.Set<String> uniqueTopics = new java.util.HashSet<>();
+
+        // 1. Extract from Markdown
+        if (post.getMarkdown() != null) {
+            Pattern pattern = Pattern.compile("#(\\S+)");
+            Matcher matcher = pattern.matcher(post.getMarkdown());
+            while (matcher.find()) {
+                String name = matcher.group(1);
+                if (name.length() > 50) name = name.substring(0, 50);
+                uniqueTopics.add(name);
+            }
+        }
+
+        // 2. Extract from explicit topics list (from UI selection)
+        if (post.getTopics() != null) {
+            for (com.outdoor.demo.entity.Topic t : post.getTopics()) {
+                if (t.getName() != null && !t.getName().isEmpty()) {
+                    String name = t.getName();
+                    if (name.length() > 50) name = name.substring(0, 50);
+                    uniqueTopics.add(name);
+                }
+            }
+        }
+
+        // 3. Save to DB
+        for (String topicName : uniqueTopics) {
             try {
                 // Find or create topic
                 com.outdoor.demo.entity.Topic topic = topicMapper.findByName(topicName);
@@ -100,7 +119,7 @@ public class ContentServiceImpl implements ContentService {
         }
     }
 
-    private void enrichPostWithMedia(Post post) {
+    private void enrichPostWithMedia(Post post, Long currentUserId) {
         if (post == null) return;
         try {
             post.setImages(postImageMapper.findByPostId(post.getId()));
@@ -110,23 +129,31 @@ public class ContentServiceImpl implements ContentService {
             }
             // Populate topics
             post.setTopics(topicMapper.findByPostId(post.getId()));
+            
+            // Check if liked by current user
+            if (currentUserId != null) {
+                Integer count = postLikeMapper.exists(post.getId(), currentUserId);
+                post.setIsLiked(count != null && count > 0);
+            } else {
+                post.setIsLiked(false);
+            }
         } catch (Exception e) {
             // ignore
         }
     }
 
-    private void enrichPosts(List<Post> posts) {
+    private void enrichPosts(List<Post> posts, Long currentUserId) {
         if (posts == null) return;
         for (Post post : posts) {
-            enrichPostWithMedia(post);
+            enrichPostWithMedia(post, currentUserId);
         }
     }
 
     @Override
-    public List<Post> listRecentPosts() {
+    public List<Post> listRecentPosts(Long currentUserId) {
         try {
             List<Post> posts = postMapper.findRecent();
-            enrichPosts(posts);
+            enrichPosts(posts, currentUserId);
             return posts;
         } catch (Exception e) {
             return Collections.emptyList();
@@ -134,10 +161,10 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public List<Post> listUserPosts(Long userId) {
+    public List<Post> listUserPosts(Long userId, Long currentUserId) {
         try {
             List<Post> posts = postMapper.findByUserId(userId);
-            enrichPosts(posts);
+            enrichPosts(posts, currentUserId);
             return posts;
         } catch (Exception e) {
             return Collections.emptyList();
@@ -145,10 +172,10 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public List<Post> listNearbyPosts(Double lat, Double lng, Double radius) {
+    public List<Post> listNearbyPosts(Double lat, Double lng, Double radius, Long currentUserId) {
         try {
             List<Post> posts = postMapper.findNearby(lat, lng, radius);
-            enrichPosts(posts);
+            enrichPosts(posts, currentUserId);
             return posts;
         } catch (Exception e) {
             e.printStackTrace();
@@ -221,10 +248,10 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public Post getPost(Long id) {
+    public Post getPost(Long id, Long currentUserId) {
         try {
             Post post = postMapper.findById(id);
-            enrichPostWithMedia(post);
+            enrichPostWithMedia(post, currentUserId);
             return post;
         } catch (Exception e) {
             return null;
@@ -269,20 +296,20 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public List<Post> listPopularPosts() {
+    public List<Post> listPopularPosts(Long currentUserId) {
         try {
             // Get top 20 IDs from Redis
             Set<Object> ids = redisTemplate.opsForZSet().reverseRange(REDIS_KEY_POPULAR, 0, 19);
             if (ids == null || ids.isEmpty()) {
                 // Fallback to DB if Redis is empty (or initial state)
-                return listRecentPosts(); 
+                return listRecentPosts(currentUserId); 
             }
             List<Long> postIds = ids.stream()
                     .map(id -> Long.valueOf(id.toString()))
                     .collect(Collectors.toList());
             
             List<Post> posts = postMapper.findByIds(postIds);
-            enrichPosts(posts);
+            enrichPosts(posts, currentUserId);
             return posts;
         } catch (Exception e) {
             e.printStackTrace();
@@ -297,9 +324,21 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public List<Comment> listCommentsByPost(Long postId) {
+    public List<Comment> listCommentsByPost(Long postId, Long currentUserId) {
         try {
-            return commentMapper.findByPostId(postId);
+            List<Comment> comments = commentMapper.findByPostId(postId);
+            if (comments != null && !comments.isEmpty()) {
+                for (Comment c : comments) {
+                    c.setLikeCount(commentLikeMapper.countByCommentId(c.getId()));
+                    if (currentUserId != null) {
+                        Integer exists = commentLikeMapper.exists(c.getId(), currentUserId);
+                        c.setIsLiked(exists != null && exists > 0);
+                    } else {
+                        c.setIsLiked(false);
+                    }
+                }
+            }
+            return comments;
         } catch (Exception e) {
             return Collections.emptyList();
         }

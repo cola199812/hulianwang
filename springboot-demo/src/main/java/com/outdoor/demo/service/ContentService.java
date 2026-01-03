@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ContentService {
     Long createPost(Post post);
-    List<Post> listRecentPosts();
-    List<Post> listUserPosts(Long userId);
-    List<Post> listNearbyPosts(Double lat, Double lng, Double radius);
+    List<Post> listRecentPosts(Long currentUserId);
+    List<Post> listUserPosts(Long userId, Long currentUserId);
+    List<Post> listNearbyPosts(Double lat, Double lng, Double radius, Long currentUserId);
     List<Media> listUserMedia(Long userId);
     Long saveMedia(Media media);
     List<Media> listMediaByPost(Long postId);
@@ -22,11 +22,11 @@ public interface ContentService {
     List<PostImage> listPostImages(Long postId);
     PostVideo getPostVideo(Long postId);
 
-    Post getPost(Long id);
+    Post getPost(Long id, Long currentUserId);
     int countPostLikes(Long postId);
     boolean togglePostLike(Long postId, Long userId);
     Long addComment(com.outdoor.demo.entity.Comment comment);
-    java.util.List<com.outdoor.demo.entity.Comment> listCommentsByPost(Long postId);
+    java.util.List<com.outdoor.demo.entity.Comment> listCommentsByPost(Long postId, Long currentUserId);
     int countComments(Long postId);
     int countCommentLikes(Long commentId);
     boolean toggleCommentLike(Long commentId, Long userId);
@@ -34,6 +34,6 @@ public interface ContentService {
     
     // Topics & Popularity
     List<com.outdoor.demo.entity.Topic> listTopics();
-    List<Post> listPopularPosts();
+    List<Post> listPopularPosts(Long currentUserId);
     void incrementViewCount(Long postId);
 }

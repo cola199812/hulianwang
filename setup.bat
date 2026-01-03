@@ -1,40 +1,40 @@
 @echo off
 chcp 65001 >nul
 echo =======================================================
-echo        青年户外社交平台 - 环境一键配置脚本
+echo        Outdoor Social Platform - Setup Script
 echo =======================================================
 echo.
-echo [1/3] 正在检查 Docker 环境...
-docker -v >nul 2>&1
+echo [1/3] Checking Docker environment...
+docker info >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [错误] 未检测到 Docker，请先安装 Docker Desktop！
-    echo 下载地址: https://www.docker.com/products/docker-desktop/
+    echo [ERROR] Docker is NOT running!
+    echo Please start Docker Desktop and wait for it to initialize.
     pause
     exit
 )
 
-echo [2/3] 正在启动基础服务 (MySQL, Redis, MinIO)...
-echo 这可能需要几分钟下载镜像，请耐心等待...
+echo [2/3] Starting services (MySQL, Redis, MinIO)...
+echo This may take a few minutes to pull images...
 docker-compose up -d
 
 if %errorlevel% neq 0 (
-    echo [错误] 服务启动失败，请检查 Docker 是否正在运行。
+    echo [ERROR] Failed to start services. Please check if Docker is running.
     pause
     exit
 )
 
 echo.
-echo [3/3] 服务检查...
+echo [3/3] Service Status...
 echo -------------------------------------------------------
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 echo -------------------------------------------------------
 echo.
-echo ✅ 环境配置成功！
+echo [SUCCESS] Environment is ready!
 echo.
-echo 数据库端口: 3307 (账号: root / 密码: qq2027681066)
-echo Redis端口: 6379
-echo MinIO控制台: http://localhost:9001
+echo Database Port: 3307 (User: root / Pass: qq2027681066)
+echo Redis Port:    6379
+echo MinIO Console: http://localhost:9001
 echo.
-echo 现在您可以运行后端和前端代码了。
-echo 按任意键退出...
+echo You can now run the backend and frontend code.
+echo Press any key to exit...
 pause >nul
