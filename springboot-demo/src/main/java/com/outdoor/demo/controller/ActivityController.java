@@ -144,4 +144,16 @@ public class ActivityController {
             return ResponseEntity.badRequest().body(body);
         }
     }
+    
+    @GetMapping("/joined-ids")
+    public ResponseEntity<?> joinedIds(HttpSession session) {
+        Object uid = session.getAttribute("userId");
+        if (uid == null) {
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "未登录");
+            return ResponseEntity.status(401).body(body);
+        }
+        List<Long> ids = activityService.listJoinedActivityIds((Long) uid);
+        return ResponseEntity.ok(ids);
+    }
 }

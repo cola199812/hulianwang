@@ -146,12 +146,21 @@ public class ActivityServiceImpl implements ActivityService {
         List<ActivityUser> participants = activityUserMapper.findByActivityId(activityId);
         
         for (ActivityUser participant : participants) {
-            // 为每个参与者发送活动开始通知
             String title = "活动即将开始";
             String content = String.format("活动\"%s\"将在\"%s\"开始，请准时参加！", 
                                         activity.getName(), activity.getTime());
             notificationService.createActivityNotification(participant.getUserId(), title, content);
         }
+    }
+    
+    @Override
+    public List<Long> listJoinedActivityIds(Long userId) {
+        List<ActivityUser> list = activityUserMapper.findByUserId(userId);
+        List<Long> ids = new ArrayList<>();
+        for (ActivityUser au : list) {
+            ids.add(au.getActivityId());
+        }
+        return ids;
     }
 }
 

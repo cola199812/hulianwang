@@ -28,6 +28,10 @@ export function cancelJoin(activityId) {
   return http.delete('/activity/cancel-join', { data: { activityId } })
 }
 
+export function listJoinedActivities() {
+  return http.get('/activity/joined-ids')
+}
+
 // 检查用户是否报名了特定活动
 export async function checkIfJoined(activityId) {
   // 由于后端没有直接提供检查是否报名的API，我们可以通过获取用户的活动列表来检查

@@ -15,5 +15,6 @@ public interface ActivityService {
     void deleteActivity(Long id);
     boolean cancelJoin(Long activityId, Long userId);
     void notifyActivityStart(Long activityId);
+    List<Long> listJoinedActivityIds(Long userId);
 }
 

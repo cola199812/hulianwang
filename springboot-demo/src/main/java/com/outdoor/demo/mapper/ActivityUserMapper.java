@@ -13,5 +13,6 @@ public interface ActivityUserMapper {
     ActivityUser findByActivityIdAndUserId(@Param("activityId") Long activityId, @Param("userId") Long userId);
     int delete(@Param("id") Long id);
     List<ActivityUser> findByActivityId(@Param("activityId") Long activityId);
+    List<ActivityUser> findByUserId(@Param("userId") Long userId);
 }
 

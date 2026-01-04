@@ -57,7 +57,19 @@
           <el-table-column prop="currentPeople" label="当前人数" />
           <el-table-column label="操作" width="150">
             <template #default="{ row }">
-              <el-button size="small" type="success" @click="join(row.id)">报名</el-button>
+              <el-button
+                v-if="!joinedSet.has(row.id)"
+                size="small"
+                type="success"
+                :disabled="Number(row.currentPeople) >= Number(row.maxPeople)"
+                @click="join(row.id)"
+              >{{ Number(row.currentPeople) >= Number(row.maxPeople) ? '已满' : '报名' }}</el-button>
+              <el-button
+                v-else
+                size="small"
+                type="warning"
+                @click="cancelJoin(row.id)"
+              >取消报名</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -152,7 +164,7 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
-import { createActivity, listActivities, joinActivity, listMyActivities, updateActivity, deleteActivity } from '../api/activity'
+import { createActivity, listActivities, joinActivity, cancelJoin as cancelJoinActivity, listJoinedActivities, listMyActivities, updateActivity, deleteActivity } from '../api/activity'
 import { listRoutes } from '../api/route'
 import { ElMessage } from 'element-plus'
 
@@ -164,6 +176,7 @@ const form = reactive({
 })
 
 const list = ref([])
+const joinedSet = ref(new Set())
 const routes = ref([])
 const activeTab = ref('discover')
 const myActivities = ref([])
@@ -199,6 +212,7 @@ async function loadActivities() {
   try {
     const { data } = await listActivities()
     list.value = data || []
+    await refreshJoinedSet()
   } catch (error) {
     console.error('获取活动列表失败:', error)
     list.value = [] // 确保即使失败也不会为null
@@ -227,6 +241,16 @@ async function load() {
     })
   } catch (error) {
     console.error('Load function failed:', error)
+  }
+}
+
+async function refreshJoinedSet() {
+  try {
+    const res = await listJoinedActivities()
+    const ids = Array.isArray(res.data) ? res.data : []
+    joinedSet.value = new Set(ids)
+  } catch (e) {
+    joinedSet.value = new Set()
   }
 }
 
@@ -326,6 +350,20 @@ async function join(id) {
   } catch (error) {
     console.error('报名失败:', error)
     ElMessage.error('报名失败: ' + (error.message || '网络错误或人数已满'))
+  }
+}
+
+async function cancelJoin(id) {
+  try {
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Request timeout')), 10000)
+    )
+    await Promise.race([cancelJoinActivity(id), timeoutPromise])
+    ElMessage.success('取消报名成功')
+    await loadActivities()
+  } catch (error) {
+    console.error('取消报名失败:', error)
+    ElMessage.error('取消报名失败: ' + (error.message || '网络错误'))
   }
 }
 
